@@ -20,8 +20,17 @@ api_key = os.getenv("BINANCE_API_KEY")
 api_secret = os.getenv("BINANCE_API_SECRET")
 
 # Configuration - using valid Binance symbols
-SYMBOL1 = 'ALCH/USDT:USDT'
-SYMBOL2 = 'BTC/USDT'   # or just 'BTC/USDT' if that's correct
+
+# 🚀 Recommended symbols:
+# For stat-arb on ~$10, these work better:
+# ✅ ALCH/USDT → already configured, min ~1 USDT, low price, small quantity
+# ✅ DOGE/USDT → cheap, liquid, min ~1–2 USDT
+# ✅ ADA/USDT → same
+# ✅ XRP/USDT → min ~1–2 USDT, tight spreads
+# ✅ TRX/USDT → min ~1 USDT
+
+SYMBOL1 = 'XRP/USDT:USDT'   # or just ALCH/USDT if that worksSYMBOL1 = 'BTC/USDT'
+SYMBOL2 = 'BTC/USDT'
 RISK_AMOUNT = 10.0
 LEVERAGE = 5
 LOOKBACK = 500
@@ -45,13 +54,25 @@ async def fetch_data(exchange, symbol: str, timeframe: str, limit: int = 100) ->
         logger.error(f"Error fetching OHLCV data for {symbol}: {str(e)}")
         return pd.DataFrame()
 
-async def fetch_quotes(exchange, symbol: str) -> tuple:
+# async def fetch_quotes(exchange, symbol: str) -> tuple:
     try:
         ticker = await exchange.fetch_ticker(symbol)
+        order_book = await exchange.fetch_order_book('BTC/USDT')
+        bid = order_book['bids'][0][0] if order_book['bids'] else None
+        ask = order_book['asks'][0][0] if order_book['asks'] else None
+        if bid is None or ask is None:
+            logger.warning(f"Order book empty for BTC/USDT: bid={bid}, ask={ask}")
+        else:
+            logger.info(f"Bid: {bid}, Ask: {ask}, Spread: {ask-bid}")
+
+        print(f"Ticker for {symbol}: {ticker}")  # Debugging line
         bid = ticker.get('bid', 0.0)
         ask = ticker.get('ask', float('inf'))
 
         # Validate prices
+        if bid is None or ask is None or bid <= 0 or ask <= 0:
+            logger.warning(f"Invalid bid/ask for {symbol}: bid={bid}, ask={ask}")
+            return 0.0, float('inf')
         if bid is None or ask is None or bid <= 0 or ask <= 0:
             logger.warning(f"Invalid bid/ask for {symbol}: bid={bid}, ask={ask}")
             return 0.0, float('inf')
@@ -67,6 +88,27 @@ async def fetch_quotes(exchange, symbol: str) -> tuple:
     except Exception as e:
         logger.error(f"General error fetching {symbol}: {str(e)}")
         return 0.0, float('inf')
+
+async def fetch_quotes(exchange, symbol: str) -> tuple:
+    try:
+        order_book = await exchange.fetch_order_book(symbol)
+        bid = order_book['bids'][0][0] if order_book['bids'] else 0.0
+        ask = order_book['asks'][0][0] if order_book['asks'] else float('inf')
+
+        if bid <= 0 or ask <= 0 or bid > ask:
+            logger.warning(f"Invalid quotes for {symbol}: bid={bid}, ask={ask}")
+            return 0.0, float('inf')
+
+        logger.info(f"Bid: {bid}, Ask: {ask}, Spread: {ask-bid}")
+        return bid, ask
+
+    except ccxt.BaseError as e:
+        logger.error(f"Exchange error fetching {symbol}: {str(e)}")
+        return 0.0, float('inf')
+    except Exception as e:
+        logger.error(f"General error fetching {symbol}: {str(e)}")
+        return 0.0, float('inf')
+
 
 def calculate_indicator(
     df1: pd.DataFrame,
@@ -154,11 +196,16 @@ async def manage_positions(exchange, current_price: float, symbol: str):
             try:
                 if side == 'long':
                     if current_price >= tp_price:
-                        logger.info(f"TP hit for LONG {symbol} @ {current_price:.2f}")
+                        # logger.info(f"TP hit for LONG {symbol} @ {current_price:.2f}")
+                        # await exchange.create_market_sell_order(symbol, qty)
+                        # positions_to_remove.append(pos)
+                        logger.info(f"TP hit for LONG {symbol} @ {current_price:.6f}")
                         await exchange.create_market_sell_order(symbol, qty)
+                        track_pnl(entry_price, current_price, qty, 'long')
                         positions_to_remove.append(pos)
                     elif current_price <= sl_price:
                         logger.info(f"SL hit for LONG {symbol} @ {current_price:.2f}")
+                        track_pnl(entry_price, current_price, qty, 'short')
                         await exchange.create_market_sell_order(symbol, qty)
                         positions_to_remove.append(pos)
 
@@ -183,6 +230,39 @@ async def manage_positions(exchange, current_price: float, symbol: str):
 
     except Exception as e:
         logger.error(f"Position management error: {str(e)}")
+
+profit_history = []  # global list to store each trade's profit/loss
+
+def track_pnl(entry_price: float, exit_price: float, quantity: float, side: str, fees: float = FEE_RATE) -> float:
+    """
+    Track and print PnL for a closed position.
+
+    :param entry_price: price at which position was opened
+    :param exit_price: price at which position was closed
+    :param quantity: amount of asset traded
+    :param side: 'long' or 'short'
+    :param fees: exchange fee rate (default to global FEE_RATE)
+    :return: net PnL for this trade
+    """
+    if side == 'long':
+        gross_pnl = (exit_price - entry_price) * quantity
+    elif side == 'short':
+        gross_pnl = (entry_price - exit_price) * quantity
+    else:
+        logger.warning(f"Invalid side for PnL: {side}")
+        return 0.0
+
+    # Fees on both entry and exit
+    fee_cost = (entry_price + exit_price) * quantity * fees
+    net_pnl = gross_pnl - fee_cost
+
+    profit_history.append(net_pnl)
+
+    logger.info(f"✅ Trade closed | Side: {side.upper()} | Entry: {entry_price:.6f} | Exit: {exit_price:.6f} | "
+                f"PnL: {net_pnl:.6f} USDT | Total: {sum(profit_history):.6f} USDT")
+
+    return net_pnl
+
 
 async def place_order(exchange, signal: str, price: float, atr: float, symbol: str):
     global OPEN_POSITIONS
@@ -243,7 +323,7 @@ async def place_order(exchange, signal: str, price: float, atr: float, symbol: s
                 logger.info(f"Opened SHORT: {qty:.6f} {symbol} @ {price:.2f}")
 
         except ccxt.InsufficientFunds:
-            logger.error("Insufficient funds to open position")
+            logger.error("❌Insufficient funds to open position")
         except ccxt.NetworkError:
             logger.warning("Network error opening position - will retry")
         except Exception as e:
@@ -262,6 +342,7 @@ async def main():
             'enableRateLimit': True,
             'options': {
                 'defaultType': 'future',
+                'recvWindow': 10000,
                 'adjustForTimeDifference': True,
             }
         })
@@ -273,13 +354,23 @@ async def main():
         symbols = list(exchange.markets.keys())
 
         # Convert to DataFrame
-        # df_markets = pd.DataFrame(symbols, columns=['Symbol'])
-        # df_markets = pd.DataFrame(exchange.markets).T
-        # print(df_markets[df_markets.index.str.contains("ALCH")])
-        print(exchange.markets['BTC/USDT'])
-        print(exchange.markets['BTC/USDT:USDT'])
+        df_markets = pd.DataFrame(symbols, columns=['Symbol'])
+        df_markets.to_csv("binance_markets.csv", index=False)
+        df_markets = pd.DataFrame(exchange.markets).T
+        print(df_markets[df_markets.index.str.contains("ALCH")])
+        symbols = list(exchange.markets.keys())
+        print([s for s in symbols if 'ALCH' in s])
+        df_markets = pd.DataFrame(exchange.markets).T
+        df_markets.to_csv("binance_markets.csv")
+        print(df_markets[df_markets.index.str.contains("ALCH")])
+        print([s for s in exchange.markets if 'BTC' in s])
 
 
+        futures = [k for k, v in exchange.markets.items() if v['type'] == 'future' and v['active']]
+        print(futures)
+
+
+        # Log loaded markets
         logger.info("Markets loaded successfully")
 
         # Set leverage
@@ -346,6 +437,8 @@ async def main():
             except KeyboardInterrupt:
                 logger.info("Interrupted by user — shutting down gracefully…")
 
+
+
                 break
             except Exception as e:
                 logger.error(f"Main loop error: {str(e)}")
@@ -363,5 +456,4 @@ if __name__ == "__main__":
         asyncio.run(main())
     except KeyboardInterrupt:
         logger.info("Script stopped by user.")
-      
 
