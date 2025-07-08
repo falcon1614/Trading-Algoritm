@@ -23,8 +23,10 @@ api_key = os.getenv("BINANCE_API_KEY")
 api_secret = os.getenv("BINANCE_API_SECRET")
 
 
-SYMBOL1 = 'ALCHUSDT'
-SYMBOL2 = 'BTCUSDT'
+# SYMBOL1 = 'ALCHUSDT'
+# SYMBOL2 = 'BTCUSDT'
+SYMBOL1 = 'BTCUSDT'
+SYMBOL2 = 'ETHUSDT'
 WS_URL1 = 'wss://fstream.binance.com/ws/alchusdt@depth10@100ms'
 WS_URL2 = 'wss://fstream.binance.com/ws/btcusdt@depth10@100ms'
 RISK_AMOUNT = 10.0
