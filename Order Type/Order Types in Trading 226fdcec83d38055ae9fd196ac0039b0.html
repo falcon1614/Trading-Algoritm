@@ -1,0 +1,700 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Order Types in Trading</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-default { background-color: rgba(84, 72, 49, 0.08); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="226fdcec-83d3-8055-ae9f-d196ac0039b0" class="page sans"><header><div class="page-header-icon undefined"><span class="icon">⏺️</span></div><h1 class="page-title"><strong>Order Types in Trading</strong></h1><p class="page-description"></p></header><div class="page-body"><h2 id="226fdcec-83d3-8024-9e43-da113be682d7" class="block-color-pink">Understanding Order Type in The CryptoCurrency Market</h2><h2 id="226fdcec-83d3-804b-af48-ddb28a7468ad" class="block-color-teal">📘 Introduction</h2><figure class="block-color-default callout" style="white-space:pre-wrap;display:flex" id="226fdcec-83d3-8093-9dd7-f3e9ba7eb0ea"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%"><p id="226fdcec-83d3-80a3-8850-fdee301a2737" class="">The cryptocurrency market is a high-stakes game where every move counts — picking the right <strong>order type</strong> can make or break trades.</p><p id="226fdcec-83d3-8005-bbda-d007cb46c28a" class="">As a trader deeply focused on <strong>high-frequency trading (HFT)</strong> and <strong>volume-based indicators</strong> like:</p><ul id="226fdcec-83d3-8004-9347-d79f72d1a599" class="bulleted-list"><li style="list-style-type:disc">Volume delta</li></ul><ul id="226fdcec-83d3-8084-9c53-db85339c5e7f" class="bulleted-list"><li style="list-style-type:disc">Order book imbalance </li></ul><p id="226fdcec-83d3-8021-afac-dfc4038d71eb" class="">  <a href="https://quantpedia.com/how-to-use-deep-order-flow-imbalance/">https://quantpedia.com/how-to-use-deep-order-flow-imbalance/</a></p><ul id="226fdcec-83d3-80e9-9ac4-e7ee5678881f" class="bulleted-list"><li style="list-style-type:disc">Market inflows</li></ul><p id="226fdcec-83d3-80ac-b3d3-c9f1ff14cb14" class="">…I’ve learned that <strong>mastering order types is key</strong> to outsmarting the market chaos on platforms like Binance.</p><p id="226fdcec-83d3-80e9-8e48-f1efbb62e80f" class="">Whether I’m:</p><p id="226fdcec-83d3-80c5-bb2d-c7d2c4859215" class="">✅ Scalping quick 1% moves on SOL</p><p id="226fdcec-83d3-80e6-bcb0-d160a2e0c308" class="">✅ Dodging whale manipulations like spoofing</p><p id="226fdcec-83d3-8023-a913-fa4b4f737bcf" class="">…the way I place orders directly shapes my <strong>profits, risks, and speed</strong>.</p><p id="226fdcec-83d3-80b9-b97d-d48deab0825d" class="">In this document, I dive deep into every major <strong>order type in the crypto market</strong>, explaining:</p><ul id="226fdcec-83d3-80dd-b278-ff79de743c9b" class="bulleted-list"><li style="list-style-type:disc">What they are</li></ul><ul id="226fdcec-83d3-80c2-b7a2-ef1700415a69" class="bulleted-list"><li style="list-style-type:disc">How they work</li></ul><ul id="226fdcec-83d3-80b9-ad5d-d56cb64ac74f" class="bulleted-list"><li style="list-style-type:disc">When to use them</li></ul><ul id="226fdcec-83d3-8010-9097-d2790a92fd5e" class="bulleted-list"><li style="list-style-type:disc">Pros and cons</li></ul><ul id="226fdcec-83d3-8043-b63a-d0a2e838fc98" class="bulleted-list"><li style="list-style-type:disc">How they interact with market dynamics</li></ul><figure id="226fdcec-83d3-8056-8289-e6299cf1d9f3" class="image"><a href="Order%20Types%20in%20Trading%20226fdcec83d38055ae9fd196ac0039b0/Figure1.png"><img style="width:643.96875px" src="Order%20Types%20in%20Trading%20226fdcec83d38055ae9fd196ac0039b0/Figure1.png"/></a></figure></div></figure><p id="226fdcec-83d3-809d-989a-e80ba063eb81" class="">
+</p><h2 id="226fdcec-83d3-8075-b1cf-c51923401c5a" class="block-color-teal">📝 Market Order</h2><figure class="block-color-default callout" style="white-space:pre-wrap;display:flex" id="226fdcec-83d3-80f8-86d7-fdfe29a1708a"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%"><p id="226fdcec-83d3-80c4-9c75-f277d6c6ad05" class="">A <strong>market order</strong> is an instruction to <strong>buy or sell a cryptocurrency immediately at the best available price in the order book</strong>.</p><h3 id="226fdcec-83d3-801f-a2a0-e7a6cf244bb4" class="">📊 How it works</h3><ul id="226fdcec-83d3-80a1-853b-e65867aa9d59" class="bulleted-list"><li style="list-style-type:disc">On Binance, for example, I place a market order to buy <strong>10 SOL</strong>.</li></ul><ul id="226fdcec-83d3-80c7-8f13-c98a5b132b83" class="bulleted-list"><li style="list-style-type:disc">The order executes instantly at the lowest <strong>ask price</strong> (e.g., $150.10), even if it needs to fill across multiple orders to complete.</li></ul><ul id="226fdcec-83d3-805b-80ad-cf13d4d68c9f" class="bulleted-list"><li style="list-style-type:disc">I often use market orders for <strong>scalping fast 1% moves in 24 hours</strong>, especially when <strong>volume delta shows a +5,000 SOL spike</strong>, where speed matters more than precise price control.</li></ul><hr id="226fdcec-83d3-80ba-8fdd-c79acb323861"/><h3 id="226fdcec-83d3-80c0-958e-f2e4d1a7f584" class="">✅ Advantages</h3><ul id="226fdcec-83d3-8098-b607-dc3588acdc96" class="bulleted-list"><li style="list-style-type:disc"><strong>Guaranteed execution</strong>, no matter how volatile the market is.</li></ul><ul id="226fdcec-83d3-80b5-a617-d7d0b8fb4696" class="bulleted-list"><li style="list-style-type:disc">Crucial during <strong>volatile pumps</strong>, e.g., catching a 3% DOGE surge in 72 hours.</li></ul><hr id="226fdcec-83d3-802f-879d-ec98314e79f1"/><h3 id="226fdcec-83d3-80c3-8b45-cb4947b8d0d7" class="">⚠️ Disadvantages</h3><ul id="226fdcec-83d3-808b-a45d-e89b6791d77d" class="bulleted-list"><li style="list-style-type:disc"><strong>Slippage:</strong> You might pay $150.20 instead of $150.10 if liquidity is thin.</li></ul><ul id="226fdcec-83d3-80fa-bf01-f7ffedaaaef9" class="bulleted-list"><li style="list-style-type:disc"><strong>Taker fees:</strong> Binance charges a 0.1% taker fee on market orders.</li></ul><ul id="226fdcec-83d3-80aa-9075-d0f90acca089" class="bulleted-list"><li style="list-style-type:disc"><strong>Eats into liquidity:</strong><ul id="226fdcec-83d3-8073-8a7f-ebb28a902fce" class="bulleted-list"><li style="list-style-type:circle">Tightens spreads slightly (+0.01%), but also spikes prices in low-depth markets.</li></ul></li></ul><ul id="226fdcec-83d3-804a-8ba2-f479c055ca4c" class="bulleted-list"><li style="list-style-type:disc"><strong>Vulnerable to spoofing:</strong> Fake orders can mislead you into hitting unfavorable prices before they’re pulled.</li></ul><hr id="226fdcec-83d3-8064-b094-cdd1e741faac"/><h3 id="226fdcec-83d3-806b-a3c3-f9313b5032bb" class="">🛠️ Summary</h3><p id="226fdcec-83d3-8031-8346-fcf589e916fc" class="">Market orders are a <strong>blunt but fast tool</strong> — great when speed is more important than price precision. They’re indispensable for scalping and reacting to sudden moves but can be <strong>costly if misused</strong>, especially in thin or manipulated markets.</p></div></figure><p id="22afdcec-83d3-80aa-89e3-c6c6d25b7f10" class="">
+</p><h2 id="22afdcec-83d3-8061-8f21-cfcca07c0e0b" class="block-color-pink">📝 Limit Order</h2><figure class="block-color-default callout" style="white-space:pre-wrap;display:flex" id="22afdcec-83d3-809c-b2bf-e666ed424e62"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%"><p id="22afdcec-83d3-804b-b9a6-e473d0de2d75" class="">A <strong>limit order</strong> allows you to set a specific price to <strong>buy or sell a cryptocurrency</strong>, and it executes only when the market hits that price.</p><hr id="22afdcec-83d3-80f9-b9f2-f570e9607610"/><h3 id="22afdcec-83d3-8075-890f-fffd9d319d4e" class="">📊 How it works</h3><ul id="22afdcec-83d3-8097-8acb-e2bea4c2030d" class="bulleted-list"><li style="list-style-type:disc">On Binance, for example, I place a <strong>limit order</strong> to buy <strong>10 ETH at $3,000</strong>.</li></ul><ul id="22afdcec-83d3-80cf-81cd-e34f0f5bf489" class="bulleted-list"><li style="list-style-type:disc">The order sits in the <strong>order book</strong> until it’s either filled or canceled.</li></ul><ul id="22afdcec-83d3-807e-9318-d4ffc86a87f7" class="bulleted-list"><li style="list-style-type:disc">I use limit orders mainly for <strong>swing trades</strong>, e.g., targeting a <strong>10% pump in 288 hours</strong>, placing buys at <strong>volume profile support</strong> like $3,000.</li></ul><hr id="22afdcec-83d3-80f7-9da7-f25ebb26722e"/><h3 id="22afdcec-83d3-807b-b1dd-edcc2c6584e6" class="">✅ Advantages</h3><ul id="22afdcec-83d3-80e9-bffc-e48e969f9e41" class="bulleted-list"><li style="list-style-type:disc">Saves on fees:<ul id="22afdcec-83d3-80b7-95f3-f5068fdaa356" class="bulleted-list"><li style="list-style-type:circle">Avoids Binance’s <strong>0.1% taker fee</strong></li></ul><ul id="22afdcec-83d3-8072-92fe-f37b4cb43520" class="bulleted-list"><li style="list-style-type:circle">Charges a lower <strong>0.075% maker fee</strong></li></ul></li></ul><ul id="22afdcec-83d3-808d-aa67-e089b442962f" class="bulleted-list"><li style="list-style-type:disc">Provides <strong>price control</strong> — you only buy/sell at your chosen price.</li></ul><ul id="22afdcec-83d3-8034-aa58-e4b828d7f3ba" class="bulleted-list"><li style="list-style-type:disc">Avoids <strong>slippage</strong>, unlike market orders.</li></ul><ul id="22afdcec-83d3-80e1-a02b-cccd7ee74efa" class="bulleted-list"><li style="list-style-type:disc">Adds liquidity to the market:<ul id="22afdcec-83d3-80e4-bcd5-cd1868ee69a2" class="bulleted-list"><li style="list-style-type:circle">E.g., widens order book depth by $30,000 for a 10 ETH order.</li></ul></li></ul><hr id="22afdcec-83d3-8098-813d-d66d85332c4d"/><h3 id="22afdcec-83d3-8015-bfb8-cfcb0ccb6ea6" class="">⚠️ Disadvantages</h3><ul id="22afdcec-83d3-80ee-9b87-fedb2a322d3a" class="bulleted-list"><li style="list-style-type:disc">No guaranteed execution:<ul id="22afdcec-83d3-8040-802d-de1c40d6b499" class="bulleted-list"><li style="list-style-type:circle">If ETH never hits $3,000, the order stays unfilled.</li></ul><ul id="22afdcec-83d3-803e-bb1a-ebc64f9b3e1e" class="bulleted-list"><li style="list-style-type:circle">Risk of missing fast moves like a <strong>5% pump in 144 hours</strong>.</li></ul></li></ul><ul id="22afdcec-83d3-807d-9f21-c80844100337" class="bulleted-list"><li style="list-style-type:disc">Vulnerable to spoofing:<ul id="22afdcec-83d3-8067-a14b-d6638525bac7" class="bulleted-list"><li style="list-style-type:circle">Fake limit orders by others can mislead you, though my <strong>order book scripts</strong> help detect them.</li></ul></li></ul></div></figure><p id="22bfdcec-83d3-806e-aeaf-de702541009f" class="">
+</p><h2 id="22afdcec-83d3-80da-ba03-fe575a15f09a" class="block-color-pink">📝 Stop-Limit Order</h2><figure class="block-color-default callout" style="white-space:pre-wrap;display:flex" id="22bfdcec-83d3-801b-bf20-d6aa0179b7ed"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%"><p id="22bfdcec-83d3-8031-860f-cb86434975a2" class="">A <strong>stop-limit order</strong> triggers a <strong>limit order</strong> to buy or sell <strong>once the market hits a stop price</strong>, setting a specific execution price.</p><hr id="22bfdcec-83d3-804f-bfa9-cfdd613369b9"/><h3 id="22bfdcec-83d3-8013-b558-e64fc8f84f43" class="">📊 How it works</h3><ul id="22bfdcec-83d3-80e3-86c6-c4fe03c0167c" class="bulleted-list"><li style="list-style-type:disc">Example: On Binance, I set a <strong>stop-limit order</strong> to sell <strong>20 AVAX at a $30 limit</strong> if the price drops to <strong>$31</strong>.</li></ul><ul id="22bfdcec-83d3-806d-81dd-e3bca7d51351" class="bulleted-list"><li style="list-style-type:disc">This protects me against a <strong>5% dump in 192 hours</strong>.</li></ul><ul id="22bfdcec-83d3-80e8-a8f2-e0ea813673f8" class="bulleted-list"><li style="list-style-type:disc">I often use it to limit <strong>losses in HFT scalps</strong>, e.g., exiting a long when <strong>volume delta turns negative (-5,000 AVAX)</strong>.</li></ul><hr id="22bfdcec-83d3-80bd-bb34-f8b5281d9b95"/><h3 id="22bfdcec-83d3-8001-84d0-e5d35531815b" class="">✅ Advantages</h3><ul id="22bfdcec-83d3-80d9-9600-fb30e6c36f1c" class="bulleted-list"><li style="list-style-type:disc">Provides <strong>price control</strong> and avoids slippage (if filled).</li></ul><ul id="22bfdcec-83d3-80de-a7c0-c65923a46ee2" class="bulleted-list"><li style="list-style-type:disc">Charges a lower <strong>maker fee (0.075%)</strong>, same as limit orders.</li></ul><ul id="22bfdcec-83d3-804a-b031-c337531892ae" class="bulleted-list"><li style="list-style-type:disc">Adds liquidity once triggered — supporting order book depth.</li></ul><ul id="22bfdcec-83d3-80ef-812d-f83fc0fb9052" class="bulleted-list"><li style="list-style-type:disc">Solid tool for <strong>risk management</strong> in volatile conditions.</li></ul><hr id="22bfdcec-83d3-80ec-aacc-d4f70bd01946"/><h3 id="22bfdcec-83d3-8001-8548-c95719af73bd" class="">⚠️ Disadvantages</h3><ul id="22bfdcec-83d3-80fd-8c98-ed42fc495bcc" class="bulleted-list"><li style="list-style-type:disc">May not execute if the price <strong>gaps past $30</strong>, e.g., during a <strong>10% crash in 384 hours</strong>, or if the dump is too fast.</li></ul><ul id="22bfdcec-83d3-80ce-a2bb-d7e36be9e379" class="bulleted-list"><li style="list-style-type:disc">Vulnerable to <strong>stop hunts</strong>, where spoofers push prices to trigger stops — I mitigate this by monitoring <strong>order book imbalances</strong>.</li></ul><ul id="22bfdcec-83d3-805a-9611-eb5a211407d1" class="bulleted-list"><li style="list-style-type:disc">Timing can be tricky; improper placement might lead to missed exits.</li></ul><hr id="22bfdcec-83d3-80aa-9c79-defaea2a316a"/><h3 id="22bfdcec-83d3-809e-b660-f7679fe48818" class="">🛠️ Summary</h3><p id="22bfdcec-83d3-8049-ba3c-d39767fe1f43" class="">Stop-limit orders combine the precision of limit orders with the protection of a stop. They’re a <strong>powerful risk management tool</strong>, but require careful placement to avoid falling victim to <strong>stop hunts</strong> and market gaps.</p></div></figure><p id="22bfdcec-83d3-8081-892e-e11c51b5f9dc" class="">
+</p><h2 id="22bfdcec-83d3-8040-bbc1-dec67399a079" class="block-color-pink">📝 Stop-Market Order</h2><figure class="block-color-default callout" style="white-space:pre-wrap;display:flex" id="22bfdcec-83d3-807f-b8a6-f485bb8f5fdd"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%"><p id="22bfdcec-83d3-80b1-92f5-f8d4e4bd126d" class="">A <strong>stop-market order</strong> triggers a <strong>market order</strong> to buy or sell once the market hits a <strong>stop price</strong>, executing at the best available price.</p><hr id="22bfdcec-83d3-80d5-a514-e0fa233f7b61"/><h3 id="22bfdcec-83d3-8002-b290-c403e3bf12f2" class="">📊 How it works</h3><ul id="22bfdcec-83d3-8052-b8bc-e94f43576933" class="bulleted-list"><li style="list-style-type:disc">Example: On Binance, I set a <strong>stop-market order</strong> to sell <strong>50 XRP at a $0.60 stop</strong>.</li></ul><ul id="22bfdcec-83d3-8085-9f47-e770be0d09c7" class="bulleted-list"><li style="list-style-type:disc">This dumps my position instantly if a <strong>3% dump hits in 120 hours</strong>.</li></ul><ul id="22bfdcec-83d3-8075-86dc-f647a61fbace" class="bulleted-list"><li style="list-style-type:disc">I use it in HFT to <strong>exit quickly when inflow data shows $1M outflows</strong>, signaling a potential crash.</li></ul><hr id="22bfdcec-83d3-8016-ab17-e168f8eafced"/><h3 id="22bfdcec-83d3-8067-bdb3-df67511eb805" class="">✅ Advantages</h3><ul id="22bfdcec-83d3-80ce-8df1-daa2d4c5dc95" class="bulleted-list"><li style="list-style-type:disc">Guarantees <strong>execution</strong>, even during a <strong>20% LINK dump in 840 hours</strong>.</li></ul><ul id="22bfdcec-83d3-804d-af51-e167c38a75b6" class="bulleted-list"><li style="list-style-type:disc">Vital for <strong>fast exits</strong> in high-volatility scenarios.</li></ul><ul id="22bfdcec-83d3-808a-9c0e-c85f5df261f5" class="bulleted-list"><li style="list-style-type:disc">A quick escape hatch during sharp downturns.</li></ul><hr id="22bfdcec-83d3-80af-bc12-d09248002c08"/><h3 id="22bfdcec-83d3-8079-b8df-dbf7c28997be" class="">⚠️ Disadvantages</h3><ul id="22bfdcec-83d3-807f-ad28-d71e1faa16d2" class="bulleted-list"><li style="list-style-type:disc">Slippage risk — e.g., the order might fill at <strong>$0.58 instead of $0.60</strong>.</li></ul><ul id="22bfdcec-83d3-8088-845d-e4272f2561ee" class="bulleted-list"><li style="list-style-type:disc">Higher <strong>taker fees (0.1%)</strong> compared to maker orders.</li></ul><ul id="22bfdcec-83d3-806c-a1df-e1b606fa0027" class="bulleted-list"><li style="list-style-type:disc">Drains liquidity, widening spreads by <strong>0.02%</strong> in thin markets.</li></ul><ul id="22bfdcec-83d3-8024-940a-d32d3b16b98c" class="bulleted-list"><li style="list-style-type:disc">Vulnerable to <strong>bear raids</strong>:<ul id="22bfdcec-83d3-80eb-8d69-e89bc10ef300" class="bulleted-list"><li style="list-style-type:circle">Traders trigger stops with sell walls, which my <strong>volume delta tools help detect</strong>.</li></ul></li></ul><hr id="22bfdcec-83d3-802a-803f-dfa9fb985c41"/><h3 id="22bfdcec-83d3-8087-89f8-e959adf3aa31" class="">🛠️ Summary</h3><p id="22bfdcec-83d3-8013-8a92-ff6515e994fa" class="">Stop-market orders are an essential <strong>risk management and exit strategy</strong> for volatile conditions. They’re fast and reliable but come at a cost — slippage, higher fees, and market manipulation risks. Best used when <strong>speed outweighs precision</strong>.</p></div></figure><p id="22bfdcec-83d3-80be-a2ed-f010ae1e685c" class="">
+</p><h2 id="22bfdcec-83d3-8040-b619-f8e01e44b7db" class="block-color-pink">📝 Take-Profit Limit Order</h2><figure class="block-color-default callout" style="white-space:pre-wrap;display:flex" id="22bfdcec-83d3-804b-b0f2-f9e225e730b6"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%"><p id="22bfdcec-83d3-8018-96e5-d437a3af1816" class="">A <strong>take-profit limit order</strong> triggers a <strong>limit order</strong> to buy or sell at a set price once a <strong>target price is reached</strong>, locking in gains.</p><hr id="22bfdcec-83d3-8071-b89b-e5703deb303e"/><h3 id="22bfdcec-83d3-80dd-8893-c6ee0c49a101" class="">📊 How it works</h3><ul id="22bfdcec-83d3-807d-acdb-d6b9f3f5fb8b" class="bulleted-list"><li style="list-style-type:disc">Example: On Binance, I set a <strong>take-profit limit</strong> to sell <strong>5 BTC at $71,000</strong> if the price hits <strong>$70,500</strong>.</li></ul><ul id="22bfdcec-83d3-800c-984c-f69fbfd74613" class="bulleted-list"><li style="list-style-type:disc">This lets me bank a <strong>1% pump in 24 hours</strong>.</li></ul><ul id="22bfdcec-83d3-807d-9646-e6649fee0a02" class="bulleted-list"><li style="list-style-type:disc">I use it mainly for <strong>swing trades</strong>, securing profits when <strong>volume profile shows resistance at $71,000</strong>.</li></ul><hr id="22bfdcec-83d3-8098-9636-d0190cbef865"/><h3 id="22bfdcec-83d3-8081-ac0d-d9a266838358" class="">✅ Advantages</h3><ul id="22bfdcec-83d3-8092-9fd8-c43c603db265" class="bulleted-list"><li style="list-style-type:disc">Saves fees by paying the <strong>0.075% maker fee</strong> instead of the taker fee.</li></ul><ul id="22bfdcec-83d3-80f5-bf24-d312a232c662" class="bulleted-list"><li style="list-style-type:disc">Controls exit prices and avoids slippage.</li></ul><ul id="22bfdcec-83d3-8073-a2de-db98c4d500f3" class="bulleted-list"><li style="list-style-type:disc">Adds liquidity, stabilizing spreads.</li></ul><hr id="22bfdcec-83d3-80fa-b4e5-e9f6593f82b3"/><h3 id="22bfdcec-83d3-803e-9283-cc88f7467031" class="">⚠️ Disadvantages</h3><ul id="22bfdcec-83d3-8034-bc28-dcfa141e577f" class="bulleted-list"><li style="list-style-type:disc">Might not fill if the price reverses before reaching <strong>$71,000</strong>, e.g., missing a <strong>5% pump in 120 hours</strong>.</li></ul><ul id="22bfdcec-83d3-806c-b4af-e050aa6defcd" class="bulleted-list"><li style="list-style-type:disc">Vulnerable to <strong>pump-and-dump scams</strong>, which spike prices to trigger my sells — I mitigate this with <strong>volume delta mismatch detection</strong>.</li></ul><ul id="22bfdcec-83d3-8055-a6c7-e29105ff24c0" class="bulleted-list"><li style="list-style-type:disc">Requires <strong>precise target selection</strong> to be effective.</li></ul><hr id="22bfdcec-83d3-8045-b4f1-d91392cbb02c"/><h3 id="22bfdcec-83d3-80c5-a26a-da42284a8788" class="">🛠️ Summary</h3><p id="22bfdcec-83d3-80f0-afdc-fa221ed3168c" class="">Take-profit limit orders are a reliable way to secure profits at predetermined resistance levels while maintaining price control and low fees. However, they demand patience and careful placement to avoid missed opportunities or traps.</p></div></figure><p id="22bfdcec-83d3-808b-bf65-e5a54c3ec062" class="">
+</p><h2 id="22bfdcec-83d3-8037-a0e4-fab9c348d4b8" class="block-color-pink">📝 Take-Profit Market Order</h2><figure class="block-color-default callout" style="white-space:pre-wrap;display:flex" id="22bfdcec-83d3-80f1-b721-d0f416acbdc3"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%"><p id="22bfdcec-83d3-80c2-93ce-f6c2b3503c26" class="">A <strong>take-profit market order</strong> triggers a <strong>market order</strong> to buy or sell at the best price once a <strong>target price is hit</strong>, securing gains instantly.</p><hr id="22bfdcec-83d3-80aa-81d4-f2938e7bd3a7"/><h3 id="22bfdcec-83d3-809c-9605-f241fb65886e" class="">📊 How it works</h3><ul id="22bfdcec-83d3-8024-ac31-f8c66e5959a7" class="bulleted-list"><li style="list-style-type:disc">Example: On Binance, I set a <strong>take-profit market order</strong> to sell <strong>100 DOGE at $0.20</strong> if the price reaches <strong>$0.19</strong>, cashing in a <strong>5% pump in 144 hours</strong>.</li></ul><ul id="22bfdcec-83d3-801a-a5d9-f6b4d69628c8" class="bulleted-list"><li style="list-style-type:disc">I use it in <strong>HFT scalps</strong> when <strong>order book imbalances (+0.7)</strong> signal a quick move, requiring fast exits.</li></ul><hr id="22bfdcec-83d3-8040-ab6b-fa6b6830bc32"/><h3 id="22bfdcec-83d3-80de-a4c1-c849e8c455d7" class="">✅ Advantages</h3><ul id="22bfdcec-83d3-80b5-b4d3-e3bb130a46ab" class="bulleted-list"><li style="list-style-type:disc">Ensures <strong>execution</strong>, even in fast-moving markets.</li></ul><ul id="22bfdcec-83d3-8053-9179-ea5d9940f145" class="bulleted-list"><li style="list-style-type:disc">Crucial during sharp moves, e.g., a <strong>10% pump in 288 hours</strong>.</li></ul><ul id="22bfdcec-83d3-80da-9a13-f517ba1f5712" class="bulleted-list"><li style="list-style-type:disc">A reliable way to lock in gains quickly.</li></ul><hr id="22bfdcec-83d3-8004-abe2-e2de5370a313"/><h3 id="22bfdcec-83d3-8099-b9fe-f0e2048f8981" class="">⚠️ Disadvantages</h3><ul id="22bfdcec-83d3-80bf-bdb7-dc2cd77b1462" class="bulleted-list"><li style="list-style-type:disc">Slippage risk — might execute at <strong>$0.18 instead of $0.20</strong>.</li></ul><ul id="22bfdcec-83d3-8010-af26-ee1c8e755e87" class="bulleted-list"><li style="list-style-type:disc">Higher <strong>taker fees (0.1%)</strong> compared to maker orders.</li></ul><ul id="22bfdcec-83d3-8068-9a3e-d389e26c3a69" class="bulleted-list"><li style="list-style-type:disc">Pulls liquidity and slightly widens spreads (+0.01%).</li></ul><ul id="22bfdcec-83d3-80b7-89f0-f5a328e3afd6" class="bulleted-list"><li style="list-style-type:disc">Vulnerable to <strong>spoofed pumps</strong> that trick your stops — mitigated by <strong>order book scripts</strong>.</li></ul><hr id="22bfdcec-83d3-8064-93fb-c3d83603dea0"/><h3 id="22bfdcec-83d3-807c-a83f-f02c0f5cb6ad" class="">🛠️ Summary</h3><p id="22bfdcec-83d3-80b3-8c51-c888a88e2de0" class="">Take-profit market orders are perfect for <strong>locking in gains quickly</strong> during volatile moves. However, they come at a cost — slippage, higher fees, and manipulation risk</p></div></figure><p id="22bfdcec-83d3-800f-a767-ca4b171f4500" class="">
+</p><h2 id="22bfdcec-83d3-8055-bd9c-d6009c7ba8b0" class="block-color-pink">📝 Trailing Stop Order</h2><figure class="block-color-default callout" style="white-space:pre-wrap;display:flex" id="22bfdcec-83d3-80ce-aba9-f8263b2dd044"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%"><p id="22bfdcec-83d3-809c-b381-c91a57efcc7e" class="">A <strong>trailing stop order</strong> adjusts the stop price as the market moves in your favor, locking in gains while letting profits run.</p><hr id="22bfdcec-83d3-80cb-99b1-d639b7b006af"/><h3 id="22bfdcec-83d3-8037-8910-dec775f4f7ae" class="">📊 How it works</h3><ul id="22bfdcec-83d3-80ce-8389-f9b81a793af3" class="bulleted-list"><li style="list-style-type:disc">Example: On Binance, I set a <strong>trailing stop</strong> to sell <strong>10 LINK at $20 with a $1 trail</strong>.</li></ul><ul id="22bfdcec-83d3-80ce-9e65-d251a19cb0c4" class="bulleted-list"><li style="list-style-type:disc">If LINK rises to <strong>$22</strong>, the stop moves up to <strong>$21</strong> — selling if the price drops back to $21.</li></ul><ul id="22bfdcec-83d3-8097-9170-e115f79e38e2" class="bulleted-list"><li style="list-style-type:disc">I use it for <strong>swing trades</strong>, riding moves like a <strong>20% pump in 840 hours</strong> when <strong>volume delta stays positive (+5,000 LINK)</strong>.</li></ul><hr id="22bfdcec-83d3-8089-a819-ff780d5ea6d7"/><h3 id="22bfdcec-83d3-80f6-8013-cdbfff84d223" class="">✅ Advantages</h3><ul id="22bfdcec-83d3-80a9-82ac-c042316e648e" class="bulleted-list"><li style="list-style-type:disc">Maximizes gains by following the trend upwards.</li></ul><ul id="22bfdcec-83d3-802e-9bfd-eb77ba643988" class="bulleted-list"><li style="list-style-type:disc">Guarantees <strong>execution</strong> if the market reverses.</li></ul><ul id="22bfdcec-83d3-80a1-a558-cf4096b3ac81" class="bulleted-list"><li style="list-style-type:disc">Lets profits run while still protecting downside.</li></ul><hr id="22bfdcec-83d3-8021-a031-ea833e042adb"/><h3 id="22bfdcec-83d3-80aa-94ac-d631757bdc0a" class="">⚠️ Disadvantages</h3><ul id="22bfdcec-83d3-8045-9a70-ce745c3b9490" class="bulleted-list"><li style="list-style-type:disc">Sudden reversals (e.g., <strong>5% dump in 216 hours</strong>) can trigger early sells.</li></ul><ul id="22bfdcec-83d3-80dc-9b4f-f210c572e7e3" class="bulleted-list"><li style="list-style-type:disc">Pays the <strong>0.1% taker fee</strong> on execution.</li></ul><ul id="22bfdcec-83d3-80d6-9517-fcafd77fce8c" class="bulleted-list"><li style="list-style-type:disc">Drains liquidity during dumps.</li></ul><ul id="22bfdcec-83d3-808f-b49a-e2e025a685cf" class="bulleted-list"><li style="list-style-type:disc">Vulnerable to <strong>bear raids</strong>, where sell walls trigger stops — mitigated by <strong>order book monitoring</strong>.</li></ul><ul id="22bfdcec-83d3-801d-974a-d7208702f6dc" class="bulleted-list"><li style="list-style-type:disc">Volatility can cut profits short if price swings too much.</li></ul><hr id="22bfdcec-83d3-809b-a87a-e3a9f5080118"/><h3 id="22bfdcec-83d3-8057-a602-e46504d9e9e8" class="">🛠️ Summary</h3><p id="22bfdcec-83d3-80fd-8765-f6fd53a953dc" class="">Trailing stop orders are a dynamic tool for <strong>capturing trends while managing risk</strong>, ideal for volatile markets. They’re effective for locking in gains, but traders need to balance the trail size against market volatility.</p></div></figure><p id="22bfdcec-83d3-8092-b7ee-fa0f5312bfe1" class="">
+</p><h2 id="22bfdcec-83d3-8057-8cb0-c34f1f9951bd" class="block-color-pink">📝 Iceberg Order</h2><figure class="block-color-default callout" style="white-space:pre-wrap;display:flex" id="22bfdcec-83d3-8049-86b3-e2bd295ce6af"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%"><p id="22bfdcec-83d3-8054-8616-c73948a1ea55" class="">An <strong>iceberg order</strong> hides a large order by splitting it into smaller, visible chunks, minimizing market impact.</p><hr id="22bfdcec-83d3-8084-a556-fe66a6d8cb2c"/><h3 id="22bfdcec-83d3-80df-a80f-e7072960d8a9" class="">📊 How it works</h3><ul id="22bfdcec-83d3-808b-a60e-d68ea11055ac" class="bulleted-list"><li style="list-style-type:disc">Example: On Binance, I place an <strong>iceberg order</strong> to buy <strong>1,000 ETH at $3,000</strong>, but show only <strong>10 ETH at a time</strong>.</li></ul><ul id="22bfdcec-83d3-8058-a301-c913e4b47d51" class="bulleted-list"><li style="list-style-type:disc">This avoids price spikes and builds a position discreetly.</li></ul><ul id="22bfdcec-83d3-8045-8afe-f2dc126350e8" class="bulleted-list"><li style="list-style-type:disc">I use it in <strong>HFT</strong> to accumulate without tipping off whales — for example, during a <strong>1% pump in 24 hours</strong>.</li></ul><hr id="22bfdcec-83d3-809f-9cd6-d4950518408f"/><h3 id="22bfdcec-83d3-80ad-aba2-d4556527d899" class="">✅ Advantages</h3><ul id="22bfdcec-83d3-80ca-83db-f5fa6976b984" class="bulleted-list"><li style="list-style-type:disc">Reduces slippage and market disruption.</li></ul><ul id="22bfdcec-83d3-8000-aa27-c4dc8d8676fd" class="bulleted-list"><li style="list-style-type:disc">Adds liquidity without attracting attention.</li></ul><ul id="22bfdcec-83d3-8041-b44d-eef635de8f5a" class="bulleted-list"><li style="list-style-type:disc">Helps maintain anonymity in the order book.</li></ul><hr id="22bfdcec-83d3-804b-9f94-f2bce5b4b594"/><h3 id="22bfdcec-83d3-8063-b780-f99b7a5da892" class="">⚠️ Disadvantages</h3><ul id="22bfdcec-83d3-8077-b0ce-d36c8199061a" class="bulleted-list"><li style="list-style-type:disc">Slow to fill — can miss <strong>fast 3% moves in 96 hours</strong>.</li></ul><ul id="22bfdcec-83d3-8031-8acd-fc8e34a49317" class="bulleted-list"><li style="list-style-type:disc">Higher <strong>maker fees (0.1%)</strong>.</li></ul><ul id="22bfdcec-83d3-80ba-98dd-d1ad53378fac" class="bulleted-list"><li style="list-style-type:disc">Icebergs can be misinterpreted as whale activity, attracting front-runners.</li></ul><ul id="22bfdcec-83d3-8048-a2e3-c520ac0b93f6" class="bulleted-list"><li style="list-style-type:disc">Vulnerable to spoofers who mimic them to fake depth.</li></ul><hr id="22bfdcec-83d3-80c0-ad73-e103fa554382"/><h3 id="22bfdcec-83d3-8047-baa3-f643ddb5bfb2" class="">🛠️ Summary</h3><p id="22bfdcec-83d3-8007-a41a-cbbdace6ac27" class="">Iceberg orders are great for <strong>large, stealthy position building</strong>, but they require patience and come with higher costs and slower fills. Best suited for traders who want to minimize market signals while accumulating.</p></div></figure><p id="22bfdcec-83d3-8068-8872-f1a3cbab8a53" class="">
+</p><h2 id="22bfdcec-83d3-80e3-b473-da34d2dea8f0" class="block-color-pink">📝 Post-Only Order</h2><figure class="block-color-default callout" style="white-space:pre-wrap;display:flex" id="22bfdcec-83d3-8096-b147-eadf1a1b3adc"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%"><p id="22bfdcec-83d3-8073-a754-cde6d5f9a7d2" class="">A <strong>post-only order</strong> is a limit order that executes <strong>only as a maker</strong>, and cancels if it would take liquidity.</p><hr id="22bfdcec-83d3-8044-90e6-f9138a9547b6"/><h3 id="22bfdcec-83d3-80ed-8aaa-e637e2965189" class="">📊 How it works</h3><ul id="22bfdcec-83d3-8086-9ab3-e09bfef60143" class="bulleted-list"><li style="list-style-type:disc">Example: On Binance, I place a <strong>post-only order</strong> to buy <strong>50 BNB at $500</strong>, ensuring it sits in the order book and cancels if it matches an existing ask.</li></ul><ul id="22bfdcec-83d3-80a4-ad43-f2b1281eeeb9" class="bulleted-list"><li style="list-style-type:disc">I use it in <strong>HFT</strong> to earn <strong>0.075% maker fees</strong>, placing orders at <strong>volume profile supports like $500</strong>.</li></ul><hr id="22bfdcec-83d3-808f-8036-eab253feae3c"/><h3 id="22bfdcec-83d3-80c7-9950-db7e6b8c2ff7" class="">✅ Advantages</h3><ul id="22bfdcec-83d3-808c-a672-fae7aad17077" class="bulleted-list"><li style="list-style-type:disc">Guarantees <strong>maker rebates</strong> and adds liquidity.</li></ul><ul id="22bfdcec-83d3-800e-ab3a-e5679465a082" class="bulleted-list"><li style="list-style-type:disc">Tightens spreads slightly (by ~0.01%).</li></ul><ul id="22bfdcec-83d3-80d6-823e-eb4af324d6c9" class="bulleted-list"><li style="list-style-type:disc">Saves fees compared to taker orders.</li></ul><hr id="22bfdcec-83d3-80ff-98db-f05d6a774bda"/><h3 id="22bfdcec-83d3-8014-ad79-deaf762c6503" class="">⚠️ Disadvantages</h3><ul id="22bfdcec-83d3-80b3-bdad-f8fe939250ec" class="bulleted-list"><li style="list-style-type:disc">Might not fill if the market moves too fast (e.g., <strong>5% pump in 192 hours</strong>).</li></ul><ul id="22bfdcec-83d3-80f1-99f5-d9c8ebc2118d" class="bulleted-list"><li style="list-style-type:disc">Vulnerable to spoofers flooding post-only orders to fake depth — mitigated by <strong>volume delta analysis</strong>.</li></ul><ul id="22bfdcec-83d3-800d-91bf-c8ab46db97e7" class="bulleted-list"><li style="list-style-type:disc">Useless in fast-moving markets where immediacy is key.</li></ul><hr id="22bfdcec-83d3-8037-ab9b-de1f9d01b572"/><h3 id="22bfdcec-83d3-80e6-b382-eefecc195ffb" class="">🛠️ Summary</h3><p id="22bfdcec-83d3-8068-a3e7-e11a2bbfad06" class="">Post-only orders are ideal for <strong>fee-sensitive traders and liquidity providers</strong>, but they have limited use in volatile or fast-moving conditions. A reliable staple for HFT in calm markets.</p></div></figure><p id="22bfdcec-83d3-80e2-a68c-dfcc7bb33969" class="">
+</p><h2 id="22bfdcec-83d3-8018-ab7e-d0de3d1c0674" class="block-color-pink">📝 Fill-or-Kill (FOK) Order</h2><figure class="block-color-default callout" style="white-space:pre-wrap;display:flex" id="22bfdcec-83d3-8025-af7f-dd88f1132dce"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%"><p id="22bfdcec-83d3-8061-b14c-cc03bfec39f6" class="">A <strong>fill-or-kill (FOK) order</strong> demands immediate full execution at the specified price or cancels entirely.</p><hr id="22bfdcec-83d3-8040-8ade-cf74a1409932"/><h3 id="22bfdcec-83d3-80f5-85cd-e5a23f336672" class="">📊 How it works</h3><ul id="22bfdcec-83d3-80c4-aa21-fc8f39e2241b" class="bulleted-list"><li style="list-style-type:disc">Example: On Binance, I place an <strong>FOK order</strong> to buy <strong>100 MATIC at $1.50</strong>, and it either fills completely or cancels instantly.</li></ul><ul id="22bfdcec-83d3-8066-8a97-ec030fad148f" class="bulleted-list"><li style="list-style-type:disc">I use it in <strong>HFT scalps</strong> to grab quick <strong>1% moves in 24 hours</strong>, especially when order book depth is sufficient (~$1 million), avoiding partial fills.</li></ul><hr id="22bfdcec-83d3-803c-8e27-c98a5148a466"/><h3 id="22bfdcec-83d3-8021-a17f-c6b77d6b398e" class="">✅ Advantages</h3><ul id="22bfdcec-83d3-808a-b9cf-f2b65e553f4b" class="bulleted-list"><li style="list-style-type:disc">Ensures <strong>full execution</strong> without slippage.</li></ul><ul id="22bfdcec-83d3-80a5-8515-c25e7f432d88" class="bulleted-list"><li style="list-style-type:disc">Ideal for <strong>liquid markets</strong>.</li></ul><ul id="22bfdcec-83d3-8027-acf1-e51b799afcfb" class="bulleted-list"><li style="list-style-type:disc">Avoids unwanted partial fills.</li></ul><hr id="22bfdcec-83d3-80df-918e-d3f7bfe3559a"/><h3 id="22bfdcec-83d3-8016-b755-f0e24cfd12f4" class="">⚠️ Disadvantages</h3><ul id="22bfdcec-83d3-8011-9e84-da7d425ca0d9" class="bulleted-list"><li style="list-style-type:disc">Cancels if depth is too thin, potentially missing <strong>2% pumps in 72 hours</strong>.</li></ul><ul id="22bfdcec-83d3-80be-8eaa-feea54ea6727" class="bulleted-list"><li style="list-style-type:disc">Charges <strong>0.1% taker fees</strong>.</li></ul><ul id="22bfdcec-83d3-8040-a5b6-f026bcfd39e3" class="bulleted-list"><li style="list-style-type:disc">Pulls liquidity and widens spreads slightly (~0.02%).</li></ul><ul id="22bfdcec-83d3-8081-8f08-db0d4e3076f9" class="bulleted-list"><li style="list-style-type:disc">Vulnerable to front-runners who exploit FOKs — mitigated by <strong>order book scripts</strong>.</li></ul><hr id="22bfdcec-83d3-803d-818a-e55b84b3265e"/><h3 id="22bfdcec-83d3-8026-9413-f337e82189cb" class="">🛠️ Summary</h3><p id="22bfdcec-83d3-8063-a8ee-c4ca36069b5b" class="">FOK orders are great for traders needing <strong>certainty and immediacy</strong> in liquid markets, but their rigidity limits flexibility in volatile or thin conditions.</p></div></figure><p id="22bfdcec-83d3-8024-b557-e1c9f8030a34" class="">
+</p><h2 id="22bfdcec-83d3-8003-8467-eeb0937b62db" class="block-color-pink">📝 <strong>Immediate-or-Cancel (IOC) Orders</strong></h2><div id="22bfdcec-83d3-80e5-bd19-d2a5e475db06" class="column-list"><div id="22bfdcec-83d3-8065-9d0d-f48bc7ca8153" style="width:50%" class="column"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="22bfdcec-83d3-808f-b243-f88837592834" class="code"><code class="language-Mermaid">graph TD
+A[Speed] --&gt; B[Instant execution]
+C[Flexibility] --&gt; D[Partial fills accepted]
+E[Risk Control] --&gt; F[Minimized slippage]</code></pre></div><div id="22bfdcec-83d3-804d-98be-c6eef185bc2e" style="width:50%" class="column"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="22bfdcec-83d3-8038-ab0a-d37db2296cf7" class="code"><code class="language-Mermaid">sequenceDiagram
+Manipulator-&gt;&gt;Order Book: IOC &quot;depth-testing&quot; orders
+Order Book--&gt;&gt;Market: Artificial liquidity shifts</code></pre></div></div><figure class="block-color-default callout" style="white-space:pre-wrap;display:flex" id="22bfdcec-83d3-80ec-9ea1-e5af8cb34748"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%"><h3 id="22bfdcec-83d3-80c2-9210-e99384fd0e6b" class=""><strong>🛠️ Strategic Use Cases</strong></h3><ol type="1" id="22bfdcec-83d3-80d4-b7c4-dadefb2319ba" class="numbered-list" start="1"><li><strong>HFT Exit Signals</strong><ul id="22bfdcec-83d3-80e7-b72e-c2da36226d7f" class="bulleted-list"><li style="list-style-type:disc">Trigger: -3% dump + negative volume delta</li></ul><ul id="22bfdcec-83d3-80e8-9b49-ed6296e2e45f" class="bulleted-list"><li style="list-style-type:disc">Action: Partial position liquidation</li></ul></li></ol><ol type="1" id="22bfdcec-83d3-804b-a89e-d9511be1b903" class="numbered-list" start="2"><li><strong>Slippage-Sensitive Trades</strong><p id="22bfdcec-83d3-8073-82c2-f2f8ce953b83" class="">Large orders in volatile assets</p></li></ol><ol type="1" id="22bfdcec-83d3-8007-9f25-cbd9bd8a012f" class="numbered-list" start="3"><li><strong>Liquidity Testing</strong><p id="22bfdcec-83d3-80c2-8422-ee1bad82c802" class="">(Use cautiously to avoid market impact)</p><p id="22bfdcec-83d3-80f5-a3e1-ea3e7cd22391" class="">
+</p></li></ol><h3 id="22bfdcec-83d3-8086-94cd-f3381d595b3a" class=""><strong>💡 Pro Tips</strong></h3><ol type="1" id="22bfdcec-83d3-808f-a51b-e2162ba9c3e4" class="numbered-list" start="1"><li><strong>Volume Sizing</strong><p id="22bfdcec-83d3-8011-a32d-f0701e59097e" class=""><code><strong>IOC quantity ≤ 75% of order book depth</strong></code></p></li></ol><ol type="1" id="22bfdcec-83d3-80c1-ba9c-dc30565f3b94" class="numbered-list" start="2"><li><strong>Fee Optimization</strong><p id="22bfdcec-83d3-80ad-98ac-ddc028f2f7e2" class="">python</p><p id="22bfdcec-83d3-800e-997f-c55fe79041e6" class="">Copy</p><p id="22bfdcec-83d3-80d1-88d3-df902185334e" class="">Download</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="22bfdcec-83d3-80d8-a7c1-ddf9a3008b99" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all"># Calculate effective rate:
+filled_qty = 150
+fee_rate = 0.001
+effective_fee = fee_rate * (filled_qty / total_qty)  # = 0.075%</code></pre></li></ol><ol type="1" id="22bfdcec-83d3-8092-8fe1-ce8a15ddc895" class="numbered-list" start="3"><li><strong>Hybrid Approach</strong><p id="22bfdcec-83d3-808c-ba65-f599a41c2b6f" class="">Combine IOC with OCO (One-Cancels-Other) orders</p></li></ol></div></figure></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
