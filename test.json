@@ -1,0 +1,783 @@
+{
+
+    "window.commandCenter": true,
+
+    "window.experimental.windowControlsOverlay.enabled": false,
+
+    "code-runner.clearPreviousOutput": true,
+
+    "code-runner.runInTerminal": true,
+
+    "editor.mouseWheelZoom": true,
+
+    "liveServer.settings.donotShowInfoMsg": true,
+
+    "liveServer.settings.donotVerifyTags": true,
+
+    "editor.experimental.asyncTokenizationVerification": true,
+
+    "editor.experimental.asyncTokenizationLogging": true,
+
+    "cmake.configureOnOpen": true,
+
+    "terminal.explorerKind": "both",
+
+    "livePreview.customExternalBrowser": "Chrome",
+
+    "editor.largeFileOptimizations": false,
+
+    "notebook.consolidatedRunButton": true,
+
+    "notebook.editorOptionsCustomizations": {
+
+      "editor.tabSize": 3,
+
+      "editor.indentSize": 3,
+
+      "editor.insertSpaces": false
+
+    },
+
+    "explorer.confirmDragAndDrop": false,
+
+    "C_Cpp.default.compilerPath": "C:\\MinGW\\bin\\gcc.exe",
+
+    "git.autofetch": true,
+
+    // Add other necessary configurations here...
+
+    "php.validate.executablePath": "",
+
+    "window.menuBarVisibility": "classic",
+
+    "window.customTitleBarVisibility": "windowed",
+
+
+
+
+
+    "editor.copyWithSyntaxHighlighting": false,
+
+    "diffEditor.ignoreTrimWhitespace": false,
+
+    "editor.emptySelectionClipboard": false,
+
+    "window.newWindowDimensions": "inherit",
+
+    "files.trimTrailingWhitespace": true,
+
+    "diffEditor.renderSideBySide": false,
+
+    "editor.snippetSuggestions": "top",
+
+    "editor.detectIndentation": false,
+
+    "window.nativeFullScreen": true,
+
+    "files.insertFinalNewline": true,
+
+    "files.trimFinalNewlines": true,
+
+    "workbench.editor.showTabs": "single",
+
+    "editor.lineNumbers": "off",
+
+    "editor.guides.indentation": false,
+
+
+
+    // Silence the Noise
+
+    "breadcrumbs.enabled": false,
+
+    "scm.diffDecorations": "none",
+
+    "editor.hover.delay": 1500,
+
+    "editor.hover.enabled": true,
+
+    "editor.matchBrackets": "never",
+
+    "workbench.tips.enabled": false,
+
+    "editor.colorDecorators": false,
+
+    "git.decorations.enabled": false,
+
+    "workbench.startupEditor": "none",
+
+    "editor.lightbulb.enabled": "off",
+
+    "editor.selectionHighlight": false,
+
+    "editor.overviewRulerBorder": false,
+
+    "editor.renderLineHighlight": "none",
+
+    "editor.occurrencesHighlight": "off",
+
+    "problems.decorations.enabled": false,
+
+    "editor.renderControlCharacters": false,
+
+    "editor.hideCursorInOverviewRuler": true,
+
+    "editor.gotoLocation.multipleReferences": "goto",
+
+    "editor.gotoLocation.multipleDefinitions": "goto",
+
+    "editor.gotoLocation.multipleDeclarations": "goto",
+
+    "workbench.editor.enablePreviewFromQuickOpen": false,
+
+    "editor.gotoLocation.multipleImplementations": "goto",
+
+    "editor.gotoLocation.multipleTypeDefinitions": "goto",
+
+    "editor.suggestFontSize": 16,
+
+    "editor.suggestLineHeight": 30,
+
+    "terminal.integrated.lineHeight": 1.5,
+
+    "terminal.integrated.fontSize": 16,
+
+
+
+    "search.useIgnoreFiles": false,
+
+    "search.exclude": {
+
+        // Hide everything in /vendor, except the "laravel" and "livewire" folder.
+
+        "**/vendor/{[^l],?[^ai]}*": true,
+
+        // Hide everything in /public, except "index.php"
+
+        "**/public/{[^i],?[^n]}*": true,
+
+        "**/node_modules": true,
+
+        "**/dist": true,
+
+        "**/_ide_helper.php": true,
+
+        "**/composer.lock": true,
+
+        "**/package-lock.json": true,
+
+        "storage": true,
+
+        ".phpunit.result.cache": true
+
+    },
+
+
+
+    /**
+
+    * Code
+
+    **/
+
+    // Include "-" in word selection.
+
+    "editor.wordSeparators": "`~!@#%^&*()=+[{]}\\|;:'\",.<>/?",
+
+    "emmet.includeLanguages": {
+
+        "blade": "html",
+
+        "vue-html": "html",
+
+        "vue": "html",
+
+        "react": "html",
+
+        "javascript": "html"
+
+    },
+
+
+
+    /**
+
+    * PHP
+
+    **/
+
+    "php.suggest.basic": false,
+
+
+
+    /**
+
+    * Prettier
+
+    **/
+
+    "[javascript]": {
+
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+        "editor.formatOnSave": true
+
+    },
+
+    "[typescriptreact]": {
+
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+        "editor.formatOnSave": true
+
+    },
+
+    "[tailwindcss]": {
+
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+        "editor.formatOnSave": true
+
+    },
+
+    "[vue]": {
+
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+        "editor.formatOnSave": true
+
+    },
+
+    "[javascriptreact]": {
+
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+        "editor.formatOnSave": true
+
+    },
+
+    "prettier.requireConfig": true,
+
+    "prettier.useEditorConfig": false,
+
+    "explorer.sortOrder": "type",
+
+    "prettier.tabWidth": 4,
+
+    "vetur.format.options.tabSize": 4,
+
+    "workbench.tree.indent": 15,
+
+    "[html]": {
+
+        "editor.formatOnSave": true
+
+    },
+
+    "editor.wordWrapColumn": 120,
+
+    "[css]": {
+
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+        "editor.formatOnSave": true
+
+    },
+
+
+
+    "[jsonc]": {
+
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+
+    },
+
+    "[json]": {
+
+        "editor.defaultFormatter": "vscode.json-language-features"
+
+    },
+
+    "security.workspace.trust.untrustedFiles": "open",
+
+    "editor.linkedEditing": true,
+
+    "editor.formatOnSave": false,
+
+    // "editor.fontLigatures": false,
+
+    "editor.fontLigatures": "'ss01', 'ss02', 'ss03', 'ss04', 'ss05', 'ss06', 'ss07', 'ss08', 'calt', 'dlig'",
+
+    "diffEditor.wordWrap": "on",
+
+    "notebook.output.wordWrap": true,
+
+    "editor.minimap.maxColumn": 250,
+
+    "codesnap.containerPadding": "8em",
+
+    "codesnap.boxShadow": "rgba(0, 0, 0, 0.55) 0px 12px 24px",
+
+    "explorer.confirmDelete": false,
+
+    "chat.editor.wordWrap": "on",
+
+    "[php]": {
+
+        "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+
+    },
+
+    "tailwindCSS.includeLanguages": {
+
+        "plaintext": "html"
+
+    },
+
+    "tailwindCSS.experimental.configFile": null,
+
+    "editor.fontWeight": "400",
+
+    "editor.inlineSuggest.suppressSuggestions": true,
+
+    "codesnap.backgroundColor": "#FFC540",
+
+    "codesnap.showLineNumbers": false,
+
+    "codesnap.roundedCorners": true,
+
+    "editor.padding.top": 16,
+
+    "editor.cursorBlinking": "solid",
+
+    "editor.stickyScroll.enabled": false,
+
+    "editor.lineHeight": 32,
+
+
+
+    "editor.tokenColorCustomizations": {
+
+        "textMateRules": [
+
+            {
+
+              "scope": [
+
+                "comment",
+
+                "keyword",
+
+                "variable.language",
+
+                "entity.other.attribute-name.html",
+
+                "entity.other.attribute-name",
+
+                "keyword.control",
+
+                "storage.type",
+
+                "comment",
+
+                "comment.block",
+
+                "comment.line"
+
+              ],
+
+              "settings": {
+
+                "fontStyle": ""
+
+              }
+
+            }
+
+          ]
+
+    },
+
+    "material-icon-theme.saturation": 0,
+
+    "vscode_custom_css.imports": [
+
+        "file:///Users/jayan/custom-vscode.css",
+
+        "file:///Users/jayan/vscode-script.js"
+
+    ],
+
+    "material-icon-theme.files.color": "#42a5f5",
+
+    "workbench.tree.enableStickyScroll": false,
+
+    "terminal.integrated.fontFamily": "monospace",
+
+    "editor.minimap.enabled": false,
+
+    "editor.quickSuggestions": {
+
+    "other": true,
+
+    "comments": false,
+
+    "strings": true
+
+    },
+
+    "editor.accessibilityPageSize": 14,
+
+    "files.autoSave": "afterDelay",
+
+    "debug.onTaskErrors": "debugAnyway",
+
+    "glassit.alpha": 255,
+
+    "workbench.colorTheme": "Aura Dracula Spirit (Soft)",
+
+    "github.copilot.nextEditSuggestions.enabled": true,
+
+    "chat.instructionsFilesLocations": {
+
+        ".github/instructions": true,
+
+        "C:\\Users\\jayan\\AppData\\Local\\Temp\\postman-collections-post-response.instructions.md": true,
+
+        "C:\\Users\\jayan\\AppData\\Local\\Temp\\postman-collections-pre-request.instructions.md": true,
+
+        "C:\\Users\\jayan\\AppData\\Local\\Temp\\postman-folder-post-response.instructions.md": true,
+
+        "C:\\Users\\jayan\\AppData\\Local\\Temp\\postman-folder-pre-request.instructions.md": true,
+
+        "C:\\Users\\jayan\\AppData\\Local\\Temp\\postman-http-request-post-response.instructions.md": true,
+
+        "C:\\Users\\jayan\\AppData\\Local\\Temp\\postman-http-request-pre-request.instructions.md": true,
+
+        "/tmp/postman-collections-post-response.instructions.md": true,
+
+        "/tmp/postman-collections-pre-request.instructions.md": true,
+
+        "/tmp/postman-folder-post-response.instructions.md": true,
+
+        "/tmp/postman-folder-pre-request.instructions.md": true,
+
+        "/tmp/postman-http-request-post-response.instructions.md": true,
+
+        "/tmp/postman-http-request-pre-request.instructions.md": true
+
+    },
+
+    "mssql.connectionGroups": [
+
+        {
+
+            "name": "ROOT",
+
+            "id": "3B3F981A-7E47-401D-86A4-D5832A52ACBF"
+
+        }
+
+    ],
+
+    "github.copilot.enable": {
+
+        "*": false,
+
+        "plaintext": false,
+
+        "markdown": false,
+
+        "scminput": false
+
+    },
+
+    "postman.mcp.notifications.postmanMCP": false,
+
+    "jupyter.askForKernelRestart": false,
+
+    "workbench.sideBar.location": "right",
+
+    "mdb.mcp.server": "prompt",
+
+    "git.enableSmartCommit": true,
+
+    "[cmake]": {
+
+
+
+    },
+
+    "clangd.detectExtensionConflicts": false,
+
+    "clangd.path": "c:\\Users\\jayan\\AppData\\Roaming\\Code\\User\\globalStorage\\llvm-vs-code-extensions.vscode-clangd\\install\\21.1.0\\clangd_21.1.0\\bin\\clangd.exe",
+
+    "jdk.telemetry.enabled": true,
+
+    "workbench.iconTheme": "material-icon-theme",
+
+    "material-icon-theme.hidesExplorerArrows": true,
+
+    "workbench.tree.indent": 8,
+
+    "explorer.compactFolders": false,
+
+    explorer.conformdeletion
+
+  }
+
+
+
+this upper filce procide coorect according to this and enhance your side
+
+
+
+{
+
+  "workbench.colorTheme": "Aura Dracula Spirit (Soft)",
+
+  "workbench.activityBar.location": "hidden",
+
+  "workbench.editor.showTabs": "single",
+
+  "workbench.statusBar.visible": false,
+
+  "workbench.startupEditor": "none",
+
+  "workbench.tips.enabled": false,
+
+  "editor.minimap.enabled": false,
+
+  "breadcrumbs.enabled": false,
+
+  "workbench.sideBar.location": "right",
+
+  "workbench.iconTheme": "material-icon-theme",
+
+  "material-icon-theme.hidesExplorerArrows": true,
+
+  "workbench.tree.enableStickyScroll": false,
+
+  "workbench.tree.renderIndentGuides": "none",
+
+  "workbench.tree.indent": 8,
+
+  "explorer.compactFolders": false,
+
+  "explorer.confirmDragAndDrop": false,
+
+  "explorer.confirmDelete": false,
+
+  "explorer.decorations.badges": false,
+
+  "git.decorations.enabled": false,
+
+  "window.zoomLevel": 3,
+
+  "window.customTitleBarVisibility": "never",
+
+  "window.titleBarStyle": "native",
+
+  "custom-ui-style.electron": {
+
+    "titleBarStyle": "hiddenInset",
+
+    "trafficLightPosition": {
+
+      "x": 20,
+
+      "y": 16
+
+    }
+
+  },
+
+  "custom-ui-style.stylesheet": {
+
+    ".notification-toast": "box-shadow: none !important",
+
+    ".quick-input-widget.show-file-icons": "box-shadow: none !important",
+
+    ".quick-input-widget": "top: 25vh !important",
+
+    ".quick-input-list .scrollbar": "display: none",
+
+    ".monaco-action-bar.quick-input-inline-action-bar": "display: none",
+
+    ".editor-widget.find-widget": "box-shadow: none; border-radius: 4px",
+
+    ".quick-input-titlebar": "background: #100B15 !important",
+
+    ".monaco-workbench .part.editor > .content .editor-group-container > .title.title-border-bottom:after": "display: none",
+
+    ".monaco-scrollable-element > .shadow.top": "display: none",
+
+    ".sidebar .title-label": "padding: 0 !important",
+
+    ".sidebar": "border: none !important",
+
+    ".monaco-workbench .monaco-list:not(.element-focused):focus:before": "outline: none !important",
+
+    ".monaco-list-row.focused": "outline: none !important",
+
+    ".monaco-editor .scroll-decoration": "display: none",
+
+    ".title-actions": "display: none !important",
+
+    ".title.show-file-icons .label-container .monaco-icon-label.file-icon": "justify-content: center; padding: 0 !important",
+
+    ".title .monaco-icon-label:after": "margin-right: 0",
+
+    ".monaco-workbench .part.editor > .content .editor-group-container > .title > .label-container > .title-label": "padding-left: 60px",
+
+    ".title .monaco-icon-label.file-icon": "margin: 0 60px",
+
+    ".monaco-editor .cursors-layer .cursor": "background-image: linear-gradient(135deg, #ffaffc 10%, #DA70D6 100%)"
+
+  },
+
+  "custom-ui-style.font.sansSerif": "Dank Mono",
+
+  "editor.multiCursorModifier": "ctrlCmd",
+
+  "editor.cursorBlinking": "solid",
+
+  "editor.cursorStyle": "block",
+
+  "workbench.colorCustomizations": {
+
+    "editorCursor.background": "#000000",
+
+    "editorOverviewRuler.wordHighlightStrongForeground": "#0000",
+
+    "editorOverviewRuler.selectionHighlightForeground": "#0000",
+
+    "editorOverviewRuler.rangeHighlightForeground": "#0000",
+
+    "editorOverviewRuler.wordHighlightForeground": "#0000",
+
+    "editorOverviewRuler.bracketMatchForeground": "#0000",
+
+    "editorOverviewRuler.findMatchForeground": "#0000",
+
+    "editorOverviewRuler.modifiedForeground": "#0000",
+
+    "editorOverviewRuler.deletedForeground": "#0000",
+
+    "editorOverviewRuler.warningForeground": "#0000",
+
+    "editorOverviewRuler.addedForeground": "#0000",
+
+    "editorOverviewRuler.errorForeground": "#0000",
+
+    "editorOverviewRuler.infoForeground": "#0000",
+
+    "editorOverviewRuler.border": "#0000",
+
+    "[Aura Dracula Spirit (Soft)]": {
+
+      "editorSuggestWidget.selectedBackground": "#3A334B",
+
+      "sideBar.background": "#191521"
+
+    }
+
+  },
+
+  "editor.fontFamily": "Dank Mono",
+
+  "editor.fontSize": 14,
+
+  "editor.fontLigatures": true,
+
+  "editor.lineHeight": 2.5,
+
+  "editor.tokenColorCustomizations": {
+
+    "textMateRules": [
+
+      {
+
+        "scope": "comment",
+
+        "settings": {
+
+          "fontStyle": "italic"
+
+        }
+
+      }
+
+    ]
+
+  },
+
+  "editor.stickyScroll.enabled": false,
+
+  "editor.colorDecorators": false,
+
+  "editor.codeLens": false,
+
+  "editor.links": false,
+
+  "editor.matchBrackets": "never",
+
+  "editor.parameterHints.enabled": false,
+
+  "editor.lightbulb.enabled": "off",
+
+  "editor.hover.enabled": false,
+
+  "files.trimTrailingWhitespace": true,
+
+  "files.insertFinalNewline": true,
+
+  "scm.diffDecorations": "none",
+
+  "editor.lineNumbers": "relative",
+
+  "editor.tabSize": 2,
+
+  "editor.detectIndentation": false,
+
+  "editor.showFoldingControls": "never",
+
+  "editor.guides.indentation": false,
+
+  "editor.renderWhitespace": "none",
+
+  "editor.renderLineHighlight": "none",
+
+  "editor.occurrencesHighlight": "off",
+
+  "editor.selectionHighlight": false,
+
+  "editor.scrollbar.horizontal": "hidden",
+
+  "editor.scrollbar.vertical": "hidden",
+
+  "editor.overviewRulerBorder": false,
+
+  "editor.hideCursorInOverviewRuler": true,
+
+  "editor.quickSuggestions": {
+
+    "other": "off"
+
+  },
+
+  "editor.suggestOnTriggerCharacters": false,
+
+  "editor.tabCompletion": "on",
+
+  "editor.snippetSuggestions": "top",
+
+  "emmet.triggerExpansionOnTab": true,
+
+  "files.autoSave": "afterDelay",
+
+  "update.mode": "none",
+
+  "extensions.ignoreRecommendations": true
+
+}

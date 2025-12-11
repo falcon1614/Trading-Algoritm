@@ -10,8 +10,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 logger = logging.getLogger(__name__)
 dotenv.load_dotenv()
 
-API_KEY = os.getenv("API_KEY")
-SECRET_KEY = os.getenv("SECRET_KEY")
+API_KEY = os.getenv("DEMO_API_KEY")
+SECRET_KEY = os.getenv("DEMO_SECRET_KEY")
 
 # ---------------------------
 # Variables
