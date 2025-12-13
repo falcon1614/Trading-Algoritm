@@ -30,11 +30,11 @@ FEATURE_PATH = MODEL_PATH + ".features.pkl"
 # =====================================================
 # CONFIG
 # =====================================================
-SYMBOL = "ALCHUSDT"
-SYMBOL_CCXT = "ALCH/USDT"
+SYMBOL = "ALICEUSDT"
+SYMBOL_CCXT = "ALICE/USDT"
 
-WS_DEPTH_URL = "wss://fstream.binance.com/ws/alchusdt@depth10@100ms"
-WS_TRADE_URL = "wss://fstream.binance.com/ws/alchusdt@trade"
+WS_DEPTH_URL = "wss://fstream.binance.com/ws/aliceusdt@depth10@100ms"
+WS_TRADE_URL = "wss://fstream.binance.com/ws/aliceusdt@trade"
 
 TIMEFRAME = "1m"
 CHECK_INTERVAL = 0.1
@@ -43,7 +43,7 @@ LOOKBACK_V1 = 50
 ATR_PERIOD = 14
 ML_QUANTILE = 0.75
 
-RISK_AMOUNT = 0.5        # USDT risk per trade
+RISK_AMOUNT = 0.3        # USDT risk per trade
 LEVERAGE = 5
 MAX_POSITIONS = 1
 
@@ -51,7 +51,7 @@ SL_MULTIPLIER = 1.0
 TP_MULTIPLIER = 2.0
 
 MIN_NOTIONAL = 5
-HARD_MAX_SIZE = 50       # HARD SAFETY CAP
+HARD_MAX_SIZE = 50   # TRX contracts (safe cap)
 
 # =====================================================
 # GLOBAL STATE
@@ -65,7 +65,7 @@ prob_history = []
 model = None
 FEATURES = None
 
-position_open = False
+open_position = None   # {side, size, entry, atr}
 RUNNING = True
 
 # =====================================================
@@ -89,7 +89,7 @@ def load_model():
     global model, FEATURES
     model = lgb.Booster(model_file=MODEL_PATH)
     FEATURES = joblib.load(FEATURE_PATH)
-    logger.info("Model and features loaded successfully.")
+    logger.info("Model and features loaded.")
 
 # =====================================================
 # WEBSOCKETS
@@ -103,9 +103,8 @@ async def ws_depth_listener():
                     d = json.loads(msg)
                     orderbook["bids"] = d.get("b", [])
                     orderbook["asks"] = d.get("a", [])
-        except Exception as e:
-            logger.warning(f"Depth WS reconnecting: {e}")
-            await asyncio.sleep(2)
+        except Exception:
+            await asyncio.sleep(1)
 
 async def ws_trade_listener():
     global last_trade_price
@@ -113,11 +112,9 @@ async def ws_trade_listener():
         try:
             async with websockets.connect(WS_TRADE_URL, ping_interval=20) as ws:
                 async for msg in ws:
-                    d = json.loads(msg)
-                    last_trade_price = float(d["p"])
-        except Exception as e:
-            logger.warning(f"Trade WS reconnecting: {e}")
-            await asyncio.sleep(2)
+                    last_trade_price = float(json.loads(msg)["p"])
+        except Exception:
+            await asyncio.sleep(1)
 
 # =====================================================
 # INDICATORS
@@ -128,23 +125,25 @@ def calculate_atr(df):
     lpc = (df["low"] - df["close"].shift(1)).abs()
     tr = pd.concat([hl, hpc, lpc], axis=1).max(axis=1)
     atr = tr.rolling(ATR_PERIOD).mean().iloc[-1]
-    return float(atr) if not np.isnan(atr) else 0.0
+    return float(atr) if atr and not np.isnan(atr) else 0.0
 
 # =====================================================
-# FEATURE BUILDER (MATCH TRAINING)
+# FEATURE BUILDER
 # =====================================================
 def build_features(df, v1):
     if len(df) < 50 or not orderbook["bids"] or not orderbook["asks"]:
         return None, None
 
     df = df.copy()
-
     df["ret1"] = np.log(df["close"] / df["close"].shift(1))
     df["ret3"] = np.log(df["close"] / df["close"].shift(3))
     df["vol_ma3"] = df["volume"].rolling(3).mean()
     df["vol_ma10"] = df["volume"].rolling(10).mean()
 
     atr = calculate_atr(df)
+    if atr <= 0:
+        return None, None
+
     df["atr"] = atr
 
     df["ret1_z"] = (
@@ -160,64 +159,71 @@ def build_features(df, v1):
     ask = float(orderbook["asks"][0][0])
     df.loc[df.index[-1], "spread"] = (ask - bid) / ((ask + bid) / 2)
 
-    X = df.iloc[[-1]][FEATURES].fillna(0.0)
-    return X, atr
+    try:
+        return df.iloc[[-1]][FEATURES].fillna(0.0), atr
+    except KeyError:
+        logger.error("Feature mismatch with trained model")
+        return None, None
 
 # =====================================================
-# REAL ORDER WITH EXCHANGE SL / TP
+# POSITION MANAGEMENT (ATR EXIT)
 # =====================================================
-async def place_real_order(exchange, side, price, atr):
-    global position_open
+async def manage_position(exchange, price):
+    global open_position
 
-    if atr <= 0 or position_open:
+    if open_position is None:
         return
 
-    # --- Correct size formula ---
-    raw_size = (RISK_AMOUNT / atr) * LEVERAGE
+    side = open_position["side"]
+    entry = open_position["entry"]
+    atr = open_position["atr"]
+    size = open_position["size"]
 
-    # --- Balance cap ---
-    bal = await exchange.fetch_balance()
-    free_usdt = bal["USDT"]["free"]
-    max_size_by_balance = (free_usdt * LEVERAGE) / price
+    if side == "LONG":
+        if price <= entry - atr * SL_MULTIPLIER or price >= entry + atr * TP_MULTIPLIER:
+            await exchange.create_order(SYMBOL_CCXT, "market", "sell", size)
+            logger.info("LONG closed (ATR)")
+            open_position = None
 
-    size = min(raw_size, max_size_by_balance, HARD_MAX_SIZE)
-    size = float(round(size, 3))
+    elif side == "SHORT":
+        if price >= entry + atr * SL_MULTIPLIER or price <= entry - atr * TP_MULTIPLIER:
+            await exchange.create_order(SYMBOL_CCXT, "market", "buy", size)
+            logger.info("SHORT closed (ATR)")
+            open_position = None
+
+# =====================================================
+# ENTRY
+# =====================================================
+async def open_new_position(exchange, side, price, atr):
+    global open_position
+
+    stop_distance = atr * SL_MULTIPLIER
+    if stop_distance <= 0:
+        return
+
+    size = RISK_AMOUNT / stop_distance
+    size = min(size, HARD_MAX_SIZE)
+    size = round(size, 1)
 
     if size * price < MIN_NOTIONAL:
         return
 
-    sl = price - atr * SL_MULTIPLIER if side == "BUY" else price + atr * SL_MULTIPLIER
-    tp = price + atr * TP_MULTIPLIER if side == "BUY" else price - atr * TP_MULTIPLIER
+    order_side = "buy" if side == "LONG" else "sell"
+    await exchange.create_order(SYMBOL_CCXT, "market", order_side, size)
 
-    entry_side = "buy" if side == "BUY" else "sell"
-    exit_side = "sell" if side == "BUY" else "buy"
+    open_position = {
+        "side": side,
+        "entry": price,
+        "size": size,
+        "atr": atr
+    }
 
-    await exchange.create_order(SYMBOL_CCXT, "market", entry_side, size)
-
-    await exchange.create_order(
-        SYMBOL_CCXT,
-        "STOP_MARKET",
-        exit_side,
-        size,
-        params={"stopPrice": round(sl, 4), "reduceOnly": True}
-    )
-
-    await exchange.create_order(
-        SYMBOL_CCXT,
-        "TAKE_PROFIT_MARKET",
-        exit_side,
-        size,
-        params={"stopPrice": round(tp, 4), "reduceOnly": True}
-    )
-
-    position_open = True
-    logger.info(f"REAL ORDER {side} | size={size}")
+    logger.info(f"{side} opened | size={size}")
 
 # =====================================================
-# MAIN TRADING LOOP
+# MAIN LOOP
 # =====================================================
 async def trading_loop(exchange):
-    global position_open
     load_model()
     logger.warning("🚨 LIVE TRADING ENABLED 🚨")
 
@@ -227,19 +233,19 @@ async def trading_loop(exchange):
                 await asyncio.sleep(CHECK_INTERVAL)
                 continue
 
-            vbuy = sum(float(x[1]) for x in orderbook["asks"])
-            vsell = sum(float(x[1]) for x in orderbook["bids"])
-            v1 = vbuy - vsell
+            v1 = sum(float(x[1]) for x in orderbook["asks"]) - \
+                 sum(float(x[1]) for x in orderbook["bids"])
             V1_history.append(v1)
 
             ohlcv = await exchange.fetch_ohlcv(SYMBOL_CCXT, TIMEFRAME, limit=200)
             df = pd.DataFrame(
                 ohlcv,
-                columns=["ts","open","high","low","close","volume"]
+                columns=["ts", "open", "high", "low", "close", "volume"]
             ).astype(float)
 
             X, atr = build_features(df, v1)
             if X is None:
+                await asyncio.sleep(CHECK_INTERVAL)
                 continue
 
             prob = float(model.predict(X)[0])
@@ -250,16 +256,18 @@ async def trading_loop(exchange):
 
             cutoff = np.quantile(prob_history[-200:], ML_QUANTILE)
 
-            if not position_open:
+            await manage_position(exchange, last_trade_price)
+
+            if open_position is None:
                 if prob >= cutoff:
-                    await place_real_order(exchange, "BUY", last_trade_price, atr)
+                    await open_new_position(exchange, "LONG", last_trade_price, atr)
                 elif prob <= 1 - cutoff:
-                    await place_real_order(exchange, "SELL", last_trade_price, atr)
+                    await open_new_position(exchange, "SHORT", last_trade_price, atr)
 
             await asyncio.sleep(CHECK_INTERVAL)
 
         except Exception as e:
-            logger.error(f"Trading error: {e}")
+            logger.error(f"Runtime error: {e}")
             await asyncio.sleep(1)
 
 # =====================================================

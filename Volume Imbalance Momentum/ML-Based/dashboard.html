@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Algo Trading Monitor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            background: #0e1117;
+            color: #e6edf3;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background: #161b22;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.4);
+        }
+
+        .label {
+            color: #8b949e;
+            font-size: 14px;
+        }
+
+        .value {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .green { color: #3fb950; }
+        .red { color: #f85149; }
+        .yellow { color: #d29922; }
+
+        footer {
+            margin-top: 20px;
+            color: #8b949e;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>📊 Live Trading Bot Dashboard</h1>
+
+<div class="grid">
+
+    <div class="card">
+        <div class="label">Bot Status</div>
+        <div id="status" class="value yellow">Loading...</div>
+    </div>
+
+    <div class="card">
+        <div class="label">Last Price</div>
+        <div id="price" class="value">-</div>
+    </div>
+
+    <div class="card">
+        <div class="label">V1 (Volume Imbalance)</div>
+        <div id="v1" class="value">-</div>
+    </div>
+
+    <div class="card">
+        <div class="label">ML Probability</div>
+        <div id="prob" class="value">-</div>
+    </div>
+
+    <div class="card">
+        <div class="label">ML Cutoff</div>
+        <div id="cutoff" class="value">-</div>
+    </div>
+
+    <div class="card">
+        <div class="label">Position</div>
+        <div id="position" class="value">NONE</div>
+    </div>
+
+    <div class="card">
+        <div class="label">Entry Price</div>
+        <div id="entry" class="value">-</div>
+    </div>
+
+    <div class="card">
+        <div class="label">Stop Loss</div>
+        <div id="sl" class="value">-</div>
+    </div>
+
+    <div class="card">
+        <div class="label">Take Profit</div>
+        <div id="tp" class="value">-</div>
+    </div>
+
+    <div class="card">
+        <div class="label">Live PnL (USDT)</div>
+        <div id="pnl" class="value">-</div>
+    </div>
+
+</div>
+
+<footer>
+    Auto-refresh every 100 ms • Local bot monitor
+</footer>
+
+<script>
+async function fetchStatus() {
+    try {
+        const res = await fetch("http://127.0.0.1:8000/status");
+        const d = await res.json();
+
+        document.getElementById("status").innerText = d.running ? "RUNNING" : "STOPPED";
+        document.getElementById("status").className = "value " + (d.running ? "green" : "red");
+
+        document.getElementById("price").innerText = d.price?.toFixed(4);
+        document.getElementById("v1").innerText = d.v1?.toFixed(2);
+        document.getElementById("prob").innerText = d.prob?.toFixed(4);
+        document.getElementById("cutoff").innerText = d.cutoff?.toFixed(4);
+
+        document.getElementById("position").innerText = d.position || "NONE";
+        document.getElementById("entry").innerText = d.entry?.toFixed(4);
+        document.getElementById("sl").innerText = d.sl?.toFixed(4);
+        document.getElementById("tp").innerText = d.tp?.toFixed(4);
+
+        document.getElementById("pnl").innerText = d.pnl?.toFixed(3);
+        document.getElementById("pnl").className = "value " + (d.pnl >= 0 ? "green" : "red");
+
+    } catch (e) {
+        document.getElementById("status").innerText = "DISCONNECTED";
+        document.getElementById("status").className = "value red";
+    }
+}
+
+setInterval(fetchStatus, 100);
+</script>
+
+</body>
+</html>
