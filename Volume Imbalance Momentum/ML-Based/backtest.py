@@ -1,74 +1,108 @@
 # backtest.py
+# Quantile-based ML probability filter backtest
+
+import os
+import argparse
+import joblib
 import pandas as pd
 import numpy as np
 import lightgbm as lgb
-import joblib
 
-FEATURES = joblib.load('lgb_model.txt.features.pkl') if os.path.exists('lgb_model.txt.features.pkl') else [
-    'ret1','ret3','vol_ma3','vol_ma10','atr','ret1_z','V1','V1_ma50','V1_std50','spread'
-]
+# ---------------------------
+# Load feature list
+# ---------------------------
+FEATURE_FILE = "lgb_model.txt.features.pkl"
 
-def load_model(model_path='lgb_model.txt'):
-    model = lgb.Booster(model_file=model_path)
-    return model
+if os.path.exists(FEATURE_FILE):
+    FEATURES = joblib.load(FEATURE_FILE)
+else:
+    FEATURES = [
+        'ret1',
+        'ret3',
+        'vol_ma3',
+        'vol_ma10',
+        'atr',
+        'ret1_z',
+        'V1',
+        'V1_ma50',
+        'V1_std50',
+        'spread'
+    ]
 
-def simulate(df_path='dataset.parquet', model_path='lgb_model.txt', p_threshold=0.6, risk_amount=0.5, leverage=5):
-    model = load_model(model_path)
-    df = pd.read_parquet(df_path)
+# ---------------------------
+# Backtest function
+# ---------------------------
+def backtest(data_path, model_path, quantile=0.8):
+    print("Loading dataset...")
+    df = pd.read_parquet(data_path)
+
     df = df.dropna(subset=FEATURES + ['target']).reset_index(drop=True)
+    if df.empty:
+        raise RuntimeError("Dataset is empty after cleaning.")
 
-    initial_balance = 1000.0
-    balance = initial_balance
-    positions = []
-    equity_curve = []
+    print("Loading model...")
+    model = lgb.Booster(model_file=model_path)
 
-    for i in range(len(df)-3):
-        row = df.iloc[i]
-        X = row[FEATURES].values.reshape(1,-1)
-        p = model.predict(X)[0]
-        # your imbalance logic
-        v1 = row['V1']
-        sigma = df['V1'].rolling(50).std().iloc[i] if i>=50 else 0.0
-        signal = "NEUTRAL"
-        if sigma == 0:
-            signal = "BUY" if v1>0 else ("SELL" if v1<0 else "NEUTRAL")
-        else:
-            if v1 > sigma:
-                signal = "STRONG_BUY"
-            elif v1 > 0:
-                signal = "BUY"
-            elif v1 < -sigma:
-                signal = "STRONG_SELL"
-            elif v1 < 0:
-                signal = "SELL"
+    # ---------------------------
+    # Predict probabilities
+    # ---------------------------
+    df['prob'] = model.predict(df[FEATURES])
 
-        # entry rule: require both imbalance and model
-        entry_price = row['close']
-        if signal in ["STRONG_BUY","BUY"] and p > p_threshold:
-            # buy for k=3 horizon
-            future_price = df['close'].iloc[i+3]
-            ret = (future_price - entry_price)/entry_price
-            pnl = ret * (risk_amount / (abs(ret) + 1e-9)) # naive sizing mimic
-            balance += pnl
-        elif signal in ["STRONG_SELL","SELL"] and p < (1 - p_threshold):
-            future_price = df['close'].iloc[i+3]
-            ret = (entry_price - future_price)/entry_price
-            pnl = ret * (risk_amount / (abs(ret)+1e-9))
-            balance += pnl
+    # Adaptive probability threshold
+    cutoff = df['prob'].quantile(quantile)
+    df['signal'] = (df['prob'] >= cutoff).astype(int)
 
-        equity_curve.append(balance)
+    # ---------------------------
+    # Future return (same horizon as labels)
+    # ---------------------------
+    horizon = 3
+    df['future_ret'] = df['close'].shift(-horizon) / df['close'] - 1.0
 
-    import matplotlib.pyplot as plt
-    plt.plot(equity_curve)
-    plt.title('Backtest equity')
-    plt.show()
-    print("Final balance:", balance)
+    # Strategy return
+    df['strategy_ret'] = df['signal'] * df['future_ret']
+    df['bh_ret'] = df['future_ret']
 
-if __name__ == '__main__':
-    import argparse, os
+    df = df.dropna().reset_index(drop=True)
+
+    # ---------------------------
+    # Metrics
+    # ---------------------------
+    trades = int(df['signal'].sum())
+    winrate = (df.loc[df['signal'] == 1, 'future_ret'] > 0).mean()
+
+    equity = (1 + df['strategy_ret']).cumprod()
+    bh_equity = (1 + df['bh_ret']).cumprod()
+
+    total_return = equity.iloc[-1] - 1
+    bh_return = bh_equity.iloc[-1] - 1
+    max_dd = (equity / equity.cummax() - 1).min()
+
+    print("\n===== BACKTEST RESULTS =====")
+    print(f"Trades taken      : {trades}")
+    print(f"Win rate          : {winrate:.2%}")
+    print(f"Strategy return   : {total_return:.2%}")
+    print(f"Buy & Hold return : {bh_return:.2%}")
+    print(f"Max drawdown      : {max_dd:.2%}")
+
+    return df
+
+# ---------------------------
+# Runner
+# ---------------------------
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data', default='dataset.parquet')
-    parser.add_argument('--model', default='lgb_model.txt')
-    parser.add_argument('--p', type=float, default=0.6)
+    parser.add_argument("--data", default="dataset.parquet")
+    parser.add_argument("--model", default="lgb_model.txt")
+    parser.add_argument(
+        "--q",
+        type=float,
+        default=0.8,
+        help="Top probability quantile to trade (0.7–0.9 recommended)"
+    )
     args = parser.parse_args()
-    simulate(df_path=args.data, model_path=args.model, p_threshold=args.p)
+
+    backtest(
+        data_path=args.data,
+        model_path=args.model,
+        quantile=args.q
+    )

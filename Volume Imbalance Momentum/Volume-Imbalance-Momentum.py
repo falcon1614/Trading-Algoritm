@@ -10,8 +10,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 logger = logging.getLogger(__name__)
 dotenv.load_dotenv()
 
-API_KEY = os.getenv("DEMO_API_KEY")
-SECRET_KEY = os.getenv("DEMO_SECRET_KEY")
+API_KEY = os.getenv("API_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # ---------------------------
 # Variables
@@ -30,7 +30,7 @@ V1_KEY = "V_imbalance"
 
 RISK_AMOUNT = 0.5
 LEVERAGE = 5
-MAX_POSITIONS = 2
+MAX_POSITIONS = 1
 FEE_RATE = 0.0002
 SL_MULTIPLIER = 1.0
 TP_MULTIPLIER = 2.0

@@ -1,40 +1,83 @@
 # train_model.py
+# Robust LightGBM training for financial time-series data
+
 import lightgbm as lgb
 import pandas as pd
 import numpy as np
-from sklearn.metrics import roc_auc_score, precision_recall_fscore_support
 import argparse
 import joblib
+from sklearn.metrics import roc_auc_score
 
+# ---------------------------
+# Feature list (MUST match dataset)
+# ---------------------------
 FEATURES = [
-    'ret1', 'ret3', 'vol_ma3', 'vol_ma10', 'atr',
-    'ret1_z', 'V1', 'V1_ma50', 'V1_std50', 'spread'
+    'ret1',
+    'ret3',
+    'vol_ma3',
+    'vol_ma10',
+    'atr',
+    'ret1_z',
+    'V1',
+    'V1_ma50',
+    'V1_std50',
+    'spread'
 ]
 
-def prepare_for_training(df):
-    df = df.copy()
-    # compute spread if not present
-    if 'spread' not in df.columns:
-        df['spread'] = (df['ask0'] - df['bid0']) / ((df['ask0'] + df['bid0'])/2 + 1e-9)
-    df = df.dropna(subset=FEATURES + ['target'])
-    return df
-
-def train(df_path='dataset.parquet', model_out='lgb_model.txt'):
+# ---------------------------
+# Train function
+# ---------------------------
+def train(df_path: str, model_out: str):
+    print("Loading dataset...")
     df = pd.read_parquet(df_path)
-    df = prepare_for_training(df)
 
+    # Drop rows with missing values
+    df = df.dropna(subset=FEATURES + ['target']).reset_index(drop=True)
+
+    if df.empty:
+        raise RuntimeError("Dataset is empty after cleaning. Check feature generation.")
+
+    # ---------------------------
+    # Check class distribution
+    # ---------------------------
+    class_counts = df['target'].value_counts()
+    print("\nTarget distribution:")
+    print(class_counts)
+
+    if len(class_counts) < 2:
+        raise RuntimeError(
+            "Only ONE class present in target.\n"
+            "Fix label generation (threshold too high / dataset too small)."
+        )
+
+    # ---------------------------
+    # Time-based split (NO shuffle)
+    # ---------------------------
     split_idx = int(len(df) * 0.8)
-    train = df.iloc[:split_idx]
-    val = df.iloc[split_idx:]
+    train_df = df.iloc[:split_idx]
+    val_df = df.iloc[split_idx:]
 
-    X_train = train[FEATURES]
-    y_train = train['target']
-    X_val = val[FEATURES]
-    y_val = val['target']
+    # Validation set must also contain both classes
+    if val_df['target'].nunique() < 2:
+        raise RuntimeError(
+            "Validation set has only ONE class.\n"
+            "Increase dataset size or adjust label threshold."
+        )
 
+    X_train = train_df[FEATURES]
+    y_train = train_df['target']
+    X_val = val_df[FEATURES]
+    y_val = val_df['target']
+
+    # ---------------------------
+    # LightGBM datasets
+    # ---------------------------
     train_data = lgb.Dataset(X_train, label=y_train)
-    val_data = lgb.Dataset(X_val, label=y_val, reference=train_data)
+    val_data = lgb.Dataset(X_val, label=y_val)
 
+    # ---------------------------
+    # Model parameters
+    # ---------------------------
     params = {
         'objective': 'binary',
         'metric': 'auc',
@@ -46,24 +89,52 @@ def train(df_path='dataset.parquet', model_out='lgb_model.txt'):
         'bagging_fraction': 0.8,
         'bagging_freq': 5,
         'seed': 42,
-        'verbose': -1,
+        'verbosity': -1,
     }
 
-    model = lgb.train(params,
-                      train_data,
-                      valid_sets=[val_data],
-                      early_stopping_rounds=50,
-                      num_boost_round=1000)
+    print("\nTraining LightGBM model...")
 
-    print("Validation AUC:", roc_auc_score(y_val, model.predict(X_val)))
+    model = lgb.train(
+        params,
+        train_data,
+        num_boost_round=1000,
+        valid_sets=[val_data],
+        callbacks=[
+            lgb.early_stopping(stopping_rounds=50),
+            lgb.log_evaluation(period=50),
+        ],
+    )
+
+    # ---------------------------
+    # Validation performance
+    # ---------------------------
+    y_pred = model.predict(X_val, num_iteration=model.best_iteration)
+
+    try:
+        auc = roc_auc_score(y_val, y_pred)
+        print(f"\nValidation AUC: {auc:.4f}")
+    except Exception as e:
+        print("\nAUC could not be computed:", e)
+        auc = None
+
+    # ---------------------------
+    # Save model + features
+    # ---------------------------
     model.save_model(model_out)
-    # also save a joblib wrapper for predict_proba easily
     joblib.dump(FEATURES, model_out + ".features.pkl")
-    print("Saved model:", model_out)
 
-if __name__ == '__main__':
+    print(f"\nModel saved to: {model_out}")
+    print("Feature schema saved to:", model_out + ".features.pkl")
+
+    return auc
+
+# ---------------------------
+# Runner
+# ---------------------------
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data', default='dataset.parquet')
-    parser.add_argument('--out', default='lgb_model.txt')
+    parser.add_argument("--data", default="dataset.parquet")
+    parser.add_argument("--out", default="lgb_model.txt")
     args = parser.parse_args()
+
     train(df_path=args.data, model_out=args.out)

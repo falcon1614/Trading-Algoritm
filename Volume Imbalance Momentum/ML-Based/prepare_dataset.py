@@ -1,118 +1,185 @@
 # prepare_dataset.py
-# Fetch OHLCV and snapshot orderbooks for each candle close to compute V1 (approx).
-# WARNING: This will make many requests to the exchange. Use caching/backfill politely.
+# Build ML dataset: OHLCV + Orderbook snapshot → V1 → features → labels
 
 import ccxt
 import pandas as pd
 import numpy as np
 import time
 import argparse
-from tqdm import tqdm
+import logging
 import os
 import dotenv
+from tqdm import tqdm
 
-def fetch_ohlcv(exchange, symbol, timeframe='1m', since=None, limit=500):
-    all_ = []
-    while True:
-        batch = exchange.fetch_ohlcv(symbol, timeframe=timeframe, since=since, limit=limit)
-        if not batch:
-            break
-        all_.extend(batch)
-        if len(batch) < limit:
-            break
-        since = batch[-1][0] + 1
-        time.sleep(exchange.rateLimit / 1000.0)
-    df = pd.DataFrame(all_, columns=['timestamp','open','high','low','close','volume'])
+# ---------------------------
+# Logging & Env
+# ---------------------------
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+dotenv.load_dotenv()
+API_KEY = os.getenv("API_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+# ---------------------------
+# Fetch OHLCV
+# ---------------------------
+def fetch_ohlcv(exchange, symbol, timeframe='1m', limit=1000):
+    logger.info("Fetching OHLCV...")
+    ohlcv = exchange.fetch_ohlcv(symbol, timeframe=timeframe, limit=limit)
+    df = pd.DataFrame(
+        ohlcv,
+        columns=['timestamp', 'open', 'high', 'low', 'close', 'volume']
+    )
     df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
     return df.reset_index(drop=True)
 
-def fetch_orderbook_snapshot(exchange, symbol, limit=10):
-    ob = exchange.fetch_order_book(symbol, limit=limit)
-    return ob
+# ---------------------------
+# Fetch Orderbook Snapshot (SAFE)
+# ---------------------------
+def fetch_orderbook_snapshot(exchange, symbol, limit=10, retries=3):
+    for attempt in range(retries):
+        try:
+            return exchange.fetch_order_book(symbol, limit=limit)
+        except Exception as e:
+            logger.warning(
+                f"Orderbook fetch failed ({attempt + 1}/{retries}): {e}"
+            )
+            time.sleep(2)
+    return None
 
+# ---------------------------
+# Compute V1 (SAFE)
+# ---------------------------
 def compute_v1_from_orderbook(orderbook):
-    # buyer-initiated approx = sum sizes at asks (aggressive buys take asks)
-    vbuy = sum([lvl[1] for lvl in orderbook.get('asks', [])])
-    vsell = sum([lvl[1] for lvl in orderbook.get('bids', [])])
+    if orderbook is None:
+        return np.nan, np.nan, np.nan
+
+    bids = orderbook.get("bids", [])
+    asks = orderbook.get("asks", [])
+
+    if not bids or not asks:
+        return np.nan, np.nan, np.nan
+
+    vbuy = sum(lvl[1] for lvl in asks)
+    vsell = sum(lvl[1] for lvl in bids)
     return vbuy, vsell, vbuy - vsell
 
+# ---------------------------
+# Feature Engineering
+# ---------------------------
 def add_features(df):
-    # expects df with timestamp, open, high, low, close, volume, V1 columns present
     df = df.copy()
-    df['close'] = df['close'].astype(float)
+
     df['ret1'] = np.log(df['close'] / df['close'].shift(1))
     df['ret3'] = np.log(df['close'] / df['close'].shift(3))
+
     df['vol_ma3'] = df['volume'].rolling(3).mean()
     df['vol_ma10'] = df['volume'].rolling(10).mean()
 
     # ATR
-    high_low = df['high'] - df['low']
-    high_pc = (df['high'] - df['close'].shift(1)).abs()
-    low_pc = (df['low'] - df['close'].shift(1)).abs()
-    tr = pd.concat([high_low, high_pc, low_pc], axis=1).max(axis=1)
+    hl = df['high'] - df['low']
+    hpc = (df['high'] - df['close'].shift(1)).abs()
+    lpc = (df['low'] - df['close'].shift(1)).abs()
+    tr = pd.concat([hl, hpc, lpc], axis=1).max(axis=1)
     df['atr'] = tr.rolling(14, min_periods=1).mean()
 
+    # V1 rolling stats
     df['V1_ma50'] = df['V1'].rolling(50).mean()
     df['V1_std50'] = df['V1'].rolling(50).std()
 
-    df['ret1_z'] = (df['ret1'] - df['ret1'].rolling(50).mean()) / (df['ret1'].rolling(50).std() + 1e-9)
-    df = df.dropna().reset_index(drop=True)
-    return df
+    # Spread
+    df['spread'] = (df['ask0'] - df['bid0']) / (
+        (df['ask0'] + df['bid0']) / 2 + 1e-9
+    )
 
-def label_target(df, k=3, thr=0.002):
+    # Normalized return
+    df['ret1_z'] = (
+        (df['ret1'] - df['ret1'].rolling(50).mean()) /
+        (df['ret1'].rolling(50).std() + 1e-9)
+    )
+
+    return df.dropna().reset_index(drop=True)
+
+# ---------------------------
+# Label Creation
+# ---------------------------
+def label_target(df, horizon=3, upper_q=0.6, lower_q=0.4):
     df = df.copy()
-    df['future_ret_k'] = df['close'].shift(-k) / df['close'] - 1.0
-    df['target'] = (df['future_ret_k'] >= thr).astype(int)
-    df = df.dropna(subset=['target'])
-    return df
 
-def main(api_key, api_secret, symbol='ALCHUSDT', timeframe='1m', candles=2000, ob_limit=10, outfile='dataset.parquet'):
+    future_ret = df['close'].shift(-horizon) / df['close'] - 1.0
+
+    q_up = future_ret.quantile(upper_q)
+    q_dn = future_ret.quantile(lower_q)
+
+    df['target'] = np.nan
+    df.loc[future_ret > q_up, 'target'] = 1
+    df.loc[future_ret < q_dn, 'target'] = 0
+
+    return df.dropna().reset_index(drop=True)
+
+
+# ---------------------------
+# Main
+# ---------------------------
+def main(symbol, timeframe, limit, outfile):
+    if not API_KEY or not SECRET_KEY:
+        raise RuntimeError("API_KEY or SECRET_KEY missing in .env")
+
     exchange = ccxt.binance({
-        'apiKey': api_key,
-        'secret': api_secret,
-        'enableRateLimit': True,
-        'options': {'defaultType': 'future'}
+        "apiKey": API_KEY,
+        "secret": SECRET_KEY,
+        "enableRateLimit": True,
+        "options": {"defaultType": "future"},
     })
 
-    # fetch recent candles
-    print("Fetching OHLCV...")
-    df = fetch_ohlcv(exchange, symbol, timeframe=timeframe, limit=1000)
-    # if candles > available, we attempt to backfill by 'since' loop - simplified here
-    if len(df) < candles:
-        # increase window (user can modify)
-        pass
+    df = fetch_ohlcv(exchange, symbol, timeframe, limit)
 
-    # for each candle timestamp get orderbook snapshot near the candle close
-    print("Fetching orderbook snapshots (this can be slow)...")
-    v1_list = []
-    asks0 = []
-    bids0 = []
-    for ts in tqdm(df['timestamp'].tolist()):
-        # be polite: small sleep
-        time.sleep(exchange.rateLimit / 1000.0)
-        ob = fetch_orderbook_snapshot(exchange, symbol, limit=ob_limit)
+    logger.info("Fetching orderbook snapshots (robust mode)...")
+
+    v1_list, ask0_list, bid0_list = [], [], []
+
+    for _ in tqdm(range(len(df))):
+        time.sleep(exchange.rateLimit / 1000)
+
+        ob = fetch_orderbook_snapshot(exchange, symbol, limit=10)
         vbuy, vsell, v1 = compute_v1_from_orderbook(ob)
+
         v1_list.append(v1)
-        asks0.append(ob['asks'][0][0] if ob['asks'] else np.nan)
-        bids0.append(ob['bids'][0][0] if ob['bids'] else np.nan)
 
-    df['V1'] = pd.Series(v1_list)
-    df['ask0'] = pd.Series(asks0)
-    df['bid0'] = pd.Series(bids0)
+        if ob and ob.get("asks") and ob.get("bids"):
+            ask0_list.append(ob["asks"][0][0])
+            bid0_list.append(ob["bids"][0][0])
+        else:
+            ask0_list.append(np.nan)
+            bid0_list.append(np.nan)
 
-    # features + labels
+    df["V1"] = v1_list
+    df["ask0"] = ask0_list
+    df["bid0"] = bid0_list
+
     df_feat = add_features(df)
-    df_labeled = label_target(df_feat, k=3, thr=0.002)
+    df_final = label_target(df_feat)
 
-    print(f"Saving dataset to {outfile} (rows: {len(df_labeled)})")
-    df_labeled.to_parquet(outfile)
-    print("done.")
+    logger.info(f"Saving dataset → {outfile} | rows={len(df_final)}")
+    df_final.to_parquet(outfile)
 
-if __name__ == '__main__':
+    logger.info("Dataset preparation completed successfully.")
+
+# ---------------------------
+# Runner
+# ---------------------------
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--api-key', required=False, default=os.getenv('API_KEY'))
-    parser.add_argument('--api-secret', required=False, default=os.getenv('SECRET_KEY'))
-    parser.add_argument('--symbol', default='ALCHUSDT')
-    parser.add_argument('--out', default='dataset.parquet')
+    parser.add_argument("--symbol", default="ALCHUSDT")
+    parser.add_argument("--timeframe", default="1m")
+    parser.add_argument("--limit", type=int, default=300)
+    parser.add_argument("--out", default="dataset.parquet")
     args = parser.parse_args()
-    main(args.api_key, args.api_secret, symbol=args.symbol, outfile=args.out)
+
+    main(
+        symbol=args.symbol,
+        timeframe=args.timeframe,
+        limit=args.limit,
+        outfile=args.out,
+    )

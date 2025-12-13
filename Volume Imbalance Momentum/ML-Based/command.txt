@@ -1,0 +1,10 @@
+
+
+python prepare_dataset.py --symbol ALCHUSDT --limit 300 --out dataset.parquet
+
+python train_model.py --data dataset.parquet --out lgb_model.txt
+
+# Backtest
+
+python backtest.py --data dataset.parquet --model lgb_model.txt --p 0.6
+
