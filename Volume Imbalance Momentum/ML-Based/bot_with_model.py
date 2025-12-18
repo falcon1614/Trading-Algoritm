@@ -43,7 +43,7 @@ LOOKBACK_V1 = 50
 ATR_PERIOD = 14
 ML_QUANTILE = 0.75
 
-RISK_AMOUNT = 0.3        # USDT risk per trade
+RISK_AMOUNT = 0.5        # USDT risk per trade
 LEVERAGE = 5
 MAX_POSITIONS = 1
 
@@ -51,7 +51,7 @@ SL_MULTIPLIER = 1.0
 TP_MULTIPLIER = 2.0
 
 MIN_NOTIONAL = 5
-HARD_MAX_SIZE = 50   # TRX contracts (safe cap)
+HARD_MAX_SIZE = 100   # TRX contracts (safe cap)
 
 # =====================================================
 # GLOBAL STATE
